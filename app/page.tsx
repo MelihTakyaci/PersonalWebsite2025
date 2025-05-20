@@ -16,7 +16,7 @@ export default function Home() {
           transition={{ duration: 0.6 }}
           className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight"
         >
-          I'm Melih ✌️
+          I&apos;m Melih ✌️
         </motion.h1>
 
         <motion.p
