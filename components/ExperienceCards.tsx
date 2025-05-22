@@ -29,7 +29,7 @@ const projects = [
     role: 'Full Stack Developer',
     period: '2024',
     gradient: 'from-pink-400 via-red-400 to-orange-300',
-    image: '/Kotgep.png',
+    image: '/Experience/KotgepWeb.png',
   },
 ];
 
