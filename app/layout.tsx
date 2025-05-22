@@ -18,7 +18,7 @@ export const metadata = {
   creator: 'Melih Takyaci',
   openGraph: {
     title: 'Melih Takyaci',
-    description: 'Full Stack and Embedded Developer portfolio using Next.js, AI, and IoT tech.',
+    description: 'Explore the professional portfolio of Melih Takyaci, a Full Stack and Embedded Systems Developer with expertise in modern web technologies (Next.js, Fastify, PostgreSQL), real-time applications, and IoT systems. Specialized in AI-powered data analysis, embedded C/C++ for STM32 and ESP32, and DevOps pipelines using Docker and GitHub Actions. This portfolio showcases innovative projects in mobile development, cloud-based CMS platforms, computer vision with YOLOv11n and OpenCV, and scalable monorepo architectures for enterprise-grade applications.',
     url: 'https://your-domain.com',
     siteName: 'Melih Takyaci Portfolio',
     images: [
