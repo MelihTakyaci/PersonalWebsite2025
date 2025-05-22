@@ -2,8 +2,11 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { useState } from 'react';
 
 export default function ContactSection() {
+  const [hovered, setHovered] = useState(false);
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 40 }}
@@ -12,8 +15,31 @@ export default function ContactSection() {
       viewport={{ once: true }}
       className="py-24 px-4 sm:px-8 flex flex-col items-center text-center"
     >
-      <div className="text-3xl sm:text-5xl font-semibold text-white mb-6 flex items-center gap-3">
-        <Image src="/default.png" height={500} width={500} alt="No" className='w-20' />
+      <div
+        className="text-3xl sm:text-5xl font-semibold text-white mb-6 flex items-center gap-3"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <motion.div
+          className="relative w-20 h-20"
+          animate={{ scale: hovered ? 1.05 : 1, rotate: hovered ? 5 : 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        >
+          {/* Base Image */}
+          <Image
+            src="/default.png"
+            height={500} width={500}
+            alt="Default Memoji"
+            className={`rounded-full object-contain transition-opacity duration-500 w-20 ${hovered ? 'opacity-0' : 'opacity-100'}`}
+          />
+          {/* Hover Image */}
+          <Image
+            src="/dyes.png"
+            height={500} width={500}
+            alt="Hover Memoji"
+            className={`rounded-full object-contain transition-opacity duration-500 absolute top-0 left-0 w-30 ${hovered ? 'opacity-100' : 'opacity-0'}`}
+          />
+        </motion.div>
         <span>get in touch</span>
       </div>
 
@@ -24,18 +50,18 @@ export default function ContactSection() {
       <div className="space-y-3 text-sm sm:text-base text-neutral-300">
         <p>
           📧 <a
-            href="mailto:melih.takyaci@gmail.com"
-            className="underline underline-offset-4 hover:text-blue-400 transition"
+            href="mailto:melihtakyaci@gmail.com"
+            className=" hover:text-blue-400 transition"
           >
-            melih.takyaci@gmail.com
+            melihtakyaci@gmail.com
           </a>
         </p>
         <p>
           💼 <a
-            href="https://www.linkedin.com/in/melihtakyaci"
+            href="https://linkedin.com/in/melih-takyaci"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline underline-offset-4 hover:text-blue-400 transition"
+            className="hover:text-blue-400 transition"
           >
             linkedin.com/in/melihtakyaci
           </a>
@@ -45,7 +71,7 @@ export default function ContactSection() {
             href="https://github.com/MelihTakyaci"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline underline-offset-4 hover:text-purple-400 transition"
+            className="hover:text-purple-400 transition"
           >
             github.com/MelihTakyaci
           </a>

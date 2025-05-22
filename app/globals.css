@@ -1,5 +1,32 @@
 @import "tailwindcss";
 
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 200%;
+  }
+}
+
+.shine-effect::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 35%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(12deg);
+  filter: blur(6px);
+  animation: shine 1.2s ease-in-out forwards;
+}
+
+.shine-parent:hover .shine-effect::before {
+  animation: shine 1.2s ease-in-out forwards;
+}
+
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

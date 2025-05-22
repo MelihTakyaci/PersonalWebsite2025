@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FaLinkedin, FaEnvelope } from 'react-icons/fa';
+import { FaLinkedin, FaEnvelope, FaGithub } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 export default function Header() {
@@ -22,27 +22,35 @@ export default function Header() {
       transition={{ duration: 0.5 }}
       className={`z-50 w-full transition-all duration-300 ${
         scrolled
-          ? 'fixed top-0 left-0 right-0 bg-neutral-900/90 backdrop-blur-xl shadow-lg'
+          ? 'fixed top-0 left-0 right-0 bg-neutral-900/90 backdrop-blur-xl shadow-md'
           : 'mt-4'
       }`}
     >
-      <div className="max-w-7xl mx-auto rounded-2xl bg-neutral-900/70 backdrop-blur-md px-4 sm:px-6 py-3 flex justify-between items-center">
-        <div className="text-xs sm:text-sm tracking-wider font-semibold text-neutral-400 uppercase">
+      <div className="max-w-7xl mx-auto rounded-2xl bg-neutral-900/70 backdrop-blur-md px-4 sm:px-6 py-2 sm:py-3 flex justify-between items-center">
+        {/* Logo or Name */}
+        <div className="text-sm sm:text-base tracking-wider font-semibold text-neutral-300 uppercase">
           Melih Takyaci
         </div>
 
-        <div className="flex gap-3 text-neutral-500">
+        {/* Social Icons */}
+        <div className="flex gap-2 sm:gap-4 text-neutral-400 text-xl sm:text-base">
           <a
-            href="https://www.linkedin.com/in/rockyhchen/"
+            href="https://linkedin.com/in/melih-takyaci"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-blue-400 transition"
+            className="p-2 sm:p-1 hover:text-blue-400 transition"
           >
-            <FaLinkedin size={18} />
+            <FaLinkedin size={20} />
           </a>
           <a
-            href="mailto:rockyhchen@gmail.com"
-            className="hover:text-red-400 transition"
+            href="https://github.com/MelihTakyaci"
+            className="p-2 sm:p-1 hover:text-white transition"
+          >
+            <FaGithub size={20} />
+          </a>
+          <a
+            href="mailto:melihtakyaci@gmail.com"
+            className="p-2 sm:p-1 hover:text-red-400 transition"
           >
             <FaEnvelope size={18} />
           </a>
