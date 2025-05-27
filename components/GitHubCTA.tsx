@@ -16,7 +16,7 @@ export default function GitHubCTA() {
         target="_blank"
         rel="noopener noreferrer"
         whileHover={{
-          scale: 1.05,
+          scale: 1.2,
           y: -4,
           boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.4)",
         }}
@@ -30,7 +30,7 @@ export default function GitHubCTA() {
           <FaGithub className="text-white text-2xl" />
         </motion.div>
         <motion.span
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: 1.07 }}
           transition={{ duration: 0.125 }}
           className="text-white text-lg font-medium"
         >

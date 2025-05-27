@@ -50,6 +50,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

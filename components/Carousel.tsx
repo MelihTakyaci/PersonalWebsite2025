@@ -4,7 +4,7 @@ const skills = [
   {
     title: 'Full Stack Web Developer',
     description:
-      'I build modern, scalable applications using Next.js, Fastify, PostgreSQL, Redis, and Docker. I enjoy crafting full-stack solutions from scratch.',
+      'I build modern, scalable applications using Next.js, Nest.js, MongoDb, Redis, PostgreSQL and Docker. I enjoy crafting full-stack solutions from scratch.',
     emoji: '🌐',
   },
   {
