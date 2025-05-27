@@ -14,7 +14,7 @@ export default function PyraminxCanvas() {
       }}
       gl={{ preserveDrawingBuffer: true }}
     >
-      <Bounds fit clip observe margin={1.2}>
+      <Bounds fit observe clip>
         <Center>
           <PyraminxModel />
         </Center>

@@ -5,12 +5,10 @@ export default function ForceBoundsRefit() {
   const bounds = useBounds()
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
+    requestAnimationFrame(() => {
       bounds.refresh().fit()
-    }, 100)
-
-    return () => clearTimeout(timeout)
-  }, [bounds])
+    })
+  }, [])
 
   return null
 }
