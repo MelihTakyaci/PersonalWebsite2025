@@ -4,10 +4,7 @@ import { useState } from 'react';
 import { Header, Carousel, ExperienceCards, ContactSection, GitHubCTA } from '@/components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Typewriter } from 'react-simple-typewriter';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stage } from '@react-three/drei';
 import PyraminxCanvas from '@/components/PyraminxCanvas';
-import dynamic from 'next/dynamic';
 
 
 export default function Home() {

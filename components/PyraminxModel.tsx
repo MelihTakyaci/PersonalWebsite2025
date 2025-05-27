@@ -11,8 +11,11 @@ useGLTF.preload('/black.glb')
 
 export default function PyraminxModel() {
   const group = useRef<Group>(null)
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isVisible, setIsVisible] = useState(true)
   const { scene } = useGLTF('/black.glb')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { camera } = useThree()
   
   // Create a stable clone of the scene to avoid issues
@@ -120,7 +123,3 @@ export default function PyraminxModel() {
   )
 }
 
-// Cleanup on unmount
-useGLTF.clear = () => {
-  useGLTF.preload.clear()
-}
