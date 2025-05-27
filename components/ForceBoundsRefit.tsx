@@ -5,10 +5,12 @@ export default function ForceBoundsRefit() {
   const bounds = useBounds()
 
   useEffect(() => {
-    requestAnimationFrame(() => {
+    const raf = requestAnimationFrame(() => {
       bounds.refresh().fit()
     })
-  }, [])
+
+    return () => cancelAnimationFrame(raf)
+  }, [bounds])
 
   return null
 }
