@@ -63,6 +63,7 @@ export default function Home() {
       <div
         className="
           w-full              /* mobil */
+          h-full
           sm:w-3/4
           md:w-2/3
           lg:w-1/2            /* desktop eşit kolon */

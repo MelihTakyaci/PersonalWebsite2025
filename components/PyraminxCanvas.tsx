@@ -1,17 +1,17 @@
-import { Canvas, useThree } from '@react-three/fiber'
-import { OrbitControls, Center, Bounds } from '@react-three/drei'
+import { Canvas } from '@react-three/fiber'
+import { OrbitControls, Center, Bounds, useBounds } from '@react-three/drei'
 import PyraminxModel from './PyraminxModel'
 import { useMemo, useEffect } from 'react'
 
-function ForceRerenderOnce() {
-  const { invalidate } = useThree()
+function ForceRefitOnce() {
+  const api = useBounds()
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      invalidate() // sahneyi zorla yeniden çiz
-    }, 100) // kısa bir gecikme yeterli
+      api.refresh().fit()  // tekrar fit ettir
+    }, 300)
     return () => clearTimeout(timeout)
-  }, [invalidate])
+  }, [api])
 
   return null
 }
@@ -30,13 +30,11 @@ export default function PyraminxCanvas() {
         }}
         gl={{ preserveDrawingBuffer: true }}
       >
-        {/* İlk yüklemede zorla redraw */}
-        <ForceRerenderOnce />
-
         <Bounds fit clip observe margin={1.2}>
           <Center>
             <PyraminxModel />
           </Center>
+          <ForceRefitOnce />
         </Bounds>
 
         <ambientLight intensity={1.4} />
