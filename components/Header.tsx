@@ -12,6 +12,13 @@ export default function Header() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)
     window.addEventListener('scroll', onScroll)
+
+    // 👇 Sayfa ilk açıldığında scroll tetikle
+    setTimeout(() => {
+      window.scrollTo(0, 1)
+      window.scrollTo(0, 0)
+    }, 50)
+
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
@@ -36,12 +43,10 @@ export default function Header() {
         `}
       >
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-2 flex justify-between items-center">
-          {/* Logo */}
           <span className="text-sm sm:text-base tracking-wider font-semibold text-neutral-300 uppercase">
             Melih Takyaci
           </span>
 
-          {/* Social Icons */}
           <div className="flex gap-2 sm:gap-4 text-neutral-400 text-xl sm:text-base">
             <a
               href="https://linkedin.com/in/melih-takyaci"
