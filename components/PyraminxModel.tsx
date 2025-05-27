@@ -1,44 +1,104 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Center, Bounds } from '@react-three/drei'
-import PyraminxModel from './PyraminxModel'
-import ForceBoundsRefit from './ForceBoundsRefit'
+import { useRef, useEffect, useState } from 'react'
+import { useFrame, useThree, extend } from '@react-three/fiber'
+import { useGLTF } from '@react-three/drei'
+import { Group, Mesh } from 'three'
+import * as THREE from 'three'
 
-export default function PyraminxCanvas() {
-  const [canvasReady, setCanvasReady] = useState(false)
+// ⚠️ CRITICAL FIX: Declare these for R3F JSX compatibility
+extend({ Group, Mesh })
+
+// Preload the model
+useGLTF.preload('/black.glb')
+
+export default function PyraminxModel() {
+  const group = useRef<Group>(null)
+  const [isVisible, setIsVisible] = useState(true)
+  const { scene } = useGLTF('/black.glb')
+  const { camera } = useThree()
+
+  const clonedScene = useRef<Group | null>(null)
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setCanvasReady(true)
-    }, 150) // canvas tam DOM'a yerleşsin, yükseklik gelsin
+    if (scene && !clonedScene.current) {
+      clonedScene.current = scene.clone()
 
-    return () => clearTimeout(timeout)
+      clonedScene.current.traverse((object) => {
+        if (object instanceof Mesh) {
+          object.frustumCulled = true
+          if (object.material) object.material.needsUpdate = true
+          if (object.geometry) object.geometry.computeBoundingSphere()
+        }
+      })
+    }
+
+    return () => {
+      if (clonedScene.current) {
+        clonedScene.current.traverse((object) => {
+          if (object instanceof Mesh) {
+            object.geometry?.dispose()
+            if (Array.isArray(object.material)) {
+              object.material.forEach(m => m.dispose())
+            } else {
+              object.material?.dispose()
+            }
+          }
+        })
+      }
+    }
+  }, [scene])
+
+  useFrame((state, delta) => {
+    if (!group.current) return
+    const t = state.clock.getElapsedTime() * 0.25
+
+    group.current.rotation.y = THREE.MathUtils.damp(
+      group.current.rotation.y,
+      t,
+      4,
+      delta,
+    )
+
+    group.current.rotation.x = THREE.MathUtils.damp(
+      group.current.rotation.x,
+      t * 0.6,
+      4,
+      delta,
+    )
+
+    group.current.position.y = Math.sin(t * 2) * 0.07
+  })
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting)
+      },
+      { threshold: 0.1 }
+    )
+
+    const canvas = document.querySelector('canvas')
+    if (canvas) observer.observe(canvas)
+
+    return () => observer.disconnect()
   }, [])
 
-  if (!canvasReady) return null
+  if (!clonedScene.current) {
+    return (
+      <mesh>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color="#000" />
+      </mesh>
+    )
+  }
 
   return (
-    <Canvas
-      camera={{ position: [0, 0, 4.5], fov: 45 }}
-      style={{
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'auto',
-      }}
-      gl={{ preserveDrawingBuffer: true }}
-    >
-      <Bounds fit observe clip>
-        <Center>
-          <PyraminxModel />
-        </Center>
-        <ForceBoundsRefit />
-      </Bounds>
-
-      <ambientLight intensity={1.4} />
-      <directionalLight position={[10, 10, 10]} intensity={1.1} />
-      <OrbitControls enableZoom={false} />
-    </Canvas>
+    <primitive
+      object={clonedScene.current}
+      ref={group}
+      scale={0.15}
+      dispose={null}
+    />
   )
 }

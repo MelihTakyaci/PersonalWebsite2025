@@ -1,9 +1,24 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Center, Bounds } from '@react-three/drei'
 import PyraminxModel from './PyraminxModel'
 import ForceBoundsRefit from './ForceBoundsRefit'
 
 export default function PyraminxCanvas() {
+  const [canvasReady, setCanvasReady] = useState(false)
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setCanvasReady(true)
+    }, 150) // DOM otursun
+
+    return () => clearTimeout(timeout)
+  }, [])
+
+  if (!canvasReady) return null
+
   return (
     <Canvas
       camera={{ position: [0, 0, 4.5], fov: 45 }}

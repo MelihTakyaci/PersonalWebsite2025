@@ -14,12 +14,6 @@ html, body, #__next {
   padding: 0;
 }
 
-.canvas-wrapper {
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  position: relative;
-}
 
 .shine-effect::before {
   content: "";
