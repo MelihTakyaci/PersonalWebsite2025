@@ -36,12 +36,12 @@ export default function PyraminxCanvas() {
         <ForceBoundsRefit />
       </Bounds>
 
-      <ambientLight intensity={1.1} />
+      <ambientLight intensity={1.75} />
 
       {/* Ana ışık - sahneye yön verir */}
       <directionalLight
         position={[5, 5, 10]}
-        intensity={1.2}
+        intensity={1.4}
         color={'#ffffff'}
         castShadow
       />
@@ -49,14 +49,14 @@ export default function PyraminxCanvas() {
       {/* Dolgu ışığı - karanlık yüzleri yumuşatır */}
       <directionalLight
         position={[-5, 2, 5]}
-        intensity={1.1}
+        intensity={1.4}
         color={'#fff'}
       />
 
       {/* Kenar ışığı (rim light) - modelin arka tarafına silüet verir */}
       <directionalLight
         position={[0, 10, -10]}
-        intensity={1.1}
+        intensity={1.4}
         color={'#fff'}
       />
       <OrbitControls enableZoom={false} />

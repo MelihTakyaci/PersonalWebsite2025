@@ -10,13 +10,13 @@ import * as THREE from 'three'
 extend({ Group, Mesh })
 
 // Preload the model
-useGLTF.preload('/black.glb')
+useGLTF.preload('/blackO.glb')
 
 export default function PyraminxModel() {
   const group = useRef<Group>(null)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isVisible, setIsVisible] = useState(true)
-  const { scene } = useGLTF('/black.glb')
+  const { scene } = useGLTF('/blackO.glb')
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { camera } = useThree()
 
