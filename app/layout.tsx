@@ -11,7 +11,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 export const metadata = {
-  title: 'Melih Takyaci | Full Stack, Embedded & AI Developer',
+  title: 'Melih Takyaci | Full Stack Developer',
   description: 'Showcasing projects in Next.js, Fastify, PostgreSQL, ESP32, and YOLOv11n. Explore Melih Takyaci’s portfolio and work.',
   keywords: ['Melih Takyaci', 'Full Stack Developer', 'Next.js', 'Fastify', 'ESP32', 'OpenCV', 'Portfolio'],
   authors: [{ name: 'Melih Takyaci' }],

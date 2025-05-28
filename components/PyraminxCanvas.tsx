@@ -12,7 +12,7 @@ export default function PyraminxCanvas() {
   useEffect(() => {
     const timeout = setTimeout(() => {
       setCanvasReady(true)
-    }, 150) // DOM otursun
+    }, 250) //Create DOM 
 
     return () => clearTimeout(timeout)
   }, [])
@@ -36,8 +36,29 @@ export default function PyraminxCanvas() {
         <ForceBoundsRefit />
       </Bounds>
 
-      <ambientLight intensity={1.4} />
-      <directionalLight position={[10, 10, 10]} intensity={1.1} />
+      <ambientLight intensity={1.1} />
+
+      {/* Ana ışık - sahneye yön verir */}
+      <directionalLight
+        position={[5, 5, 10]}
+        intensity={1.2}
+        color={'#ffffff'}
+        castShadow
+      />
+
+      {/* Dolgu ışığı - karanlık yüzleri yumuşatır */}
+      <directionalLight
+        position={[-5, 2, 5]}
+        intensity={1.1}
+        color={'#fff'}
+      />
+
+      {/* Kenar ışığı (rim light) - modelin arka tarafına silüet verir */}
+      <directionalLight
+        position={[0, 10, -10]}
+        intensity={1.1}
+        color={'#fff'}
+      />
       <OrbitControls enableZoom={false} />
     </Canvas>
   )
