@@ -1,21 +1,33 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { Header, Carousel, ExperienceCards, ContactSection, GitHubCTA } from '@/components';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Typewriter } from 'react-simple-typewriter';
-import PyraminxCanvas from '@/components/PyraminxCanvas';
+import { useState } from 'react'
+import dynamic from 'next/dynamic'
+import {
+  Header,
+  Carousel,
+  ExperienceCards,
+  ContactSection,
+  GitHubCTA,
+} from '@/components'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Typewriter } from 'react-simple-typewriter'
 
+/* ↘️  SSR’siz, yüklenene kadar null döner  */
+const PyraminxCanvas = dynamic(() => import('@/components/PyraminxCanvas'), {
+  ssr: false,
+  loading: () => null,
+})
 
 export default function Home() {
-  const [flipped, setFlipped] = useState(false);
-
+  const [flipped, setFlipped] = useState(false)
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-black via-neutral-900 to-black text-white font-sans px-4 sm:px-6 md:px-12 py-10">
       <Header />
-        <section className="flex flex-col-reverse lg:flex-row items-center justify-between px-6 md:mt-20 mt-4">
-      {/* Text */}
+
+      {/* HERO */}
+      <section className="flex flex-col-reverse lg:flex-row items-center justify-between px-6 md:mt-20 mt-4">
+        {/* Text */}
         <section className="w-full lg:w-1/2 text-center lg:text-left space-y-6">
           <motion.h1 className="text-4xl sm:text-5xl font-extrabold flex justify-center lg:justify-start items-center gap-3 md:mt-0 mt-4">
             I&apos;m Melih
@@ -60,36 +72,22 @@ export default function Home() {
         </section>
 
         {/* Canvas */}
-      <div
-        className="
-          w-full              /* mobil */
-          h-full
-          min-h-full
-          canvas-wrapper
-          sm:w-3/4
-          md:w-2/3
-          lg:w-1/2            /* desktop eşit kolon */
-          aspect-square       /* daima kare */
-          max-w-[400px]       /* 2K ekranda çok büyümesin */
-          mx-auto             /* mobilde ortala */
-          lg:mx-0             /* desktopta sola it */
-          relative
-          overflow-hidden
-          pointer-events-none /* istersen interaction => auto */
-          z-0
-        "
-        style={{
-          isolation: 'isolate',
-          willChange: 'transform',
-        }}
-      >
-        <PyraminxCanvas />
-      </div>
+        <div
+          className="
+            w-full h-full aspect-square max-w-[400px]
+            sm:w-3/4 md:w-2/3 lg:w-1/2
+            mx-auto lg:mx-0 relative overflow-hidden z-0 pointer-events-none
+          "
+          style={{ isolation: 'isolate', willChange: 'transform' }}
+        >
+          <PyraminxCanvas />
+        </div>
       </section>
+
+      {/* Diğer bölümler */}
       <section className="mt-16 sm:mt-24">
         <Carousel />
       </section>
-
       <section className="mt-20 sm:mt-32">
         <ExperienceCards />
       </section>
@@ -98,5 +96,5 @@ export default function Home() {
       </section>
       <ContactSection />
     </main>
-  );
+  )
 }
