@@ -54,7 +54,7 @@ function usePrefersReducedMotion() {
 /**
  * Sets true once the referenced element enters the viewport.
  */
-function useIsInViewport(ref, rootMargin = '0px 0px -20% 0px') {
+function useIsInViewport(ref: React.RefObject<HTMLElement | null>, rootMargin = '0px 0px -20% 0px') {
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
@@ -83,7 +83,7 @@ export default function SkillShowcase() {
   // Memoise so React key stability is kept even if order changes later
   const skills = useMemo(() => rawSkills, []);
 
-  const sectionRef = useRef(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
   const isVisible = useIsInViewport(sectionRef);
 
