@@ -99,7 +99,7 @@ export default function PyraminxModel() {
     <primitive
       object={clonedScene.current}
       ref={group}
-      scale={0.15}
+      scale={0.4}
       dispose={null}
     />
   )

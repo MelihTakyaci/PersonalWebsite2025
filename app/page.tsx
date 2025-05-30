@@ -76,9 +76,15 @@ export default function Home() {
           className="
             w-full h-full aspect-square max-w-[400px]
             sm:w-3/4 md:w-2/3 lg:w-1/2
-            mx-auto lg:mx-0 relative overflow-hidden z-0 pointer-events-none
+            mx-auto lg:mx-0 relative
           "
-          style={{ isolation: 'isolate', willChange: 'transform' }}
+          style={{ 
+            height: '400px', // Fixed height
+            minHeight: '300px',
+            maxHeight: '500px',
+            isolation: 'isolate',
+            contain: 'layout style paint', // CSS containment
+          }}
         >
           <PyraminxCanvas />
         </div>
