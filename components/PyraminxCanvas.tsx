@@ -43,7 +43,7 @@ export default function PyraminxCanvas() {
       {/* Key light - main illumination */}
       <directionalLight
         position={[6, 8, 12]}
-        intensity={1.4}
+        intensity={2.1}
         color={'#ffffff'}
         castShadow
       />
@@ -51,7 +51,7 @@ export default function PyraminxCanvas() {
       {/* Fill light - reduces harsh shadows */}
       <directionalLight
         position={[-4, 3, 8]}
-        intensity={0.7}
+        intensity={0.9}
         color={'#e6f3ff'}
       />
       
@@ -65,7 +65,7 @@ export default function PyraminxCanvas() {
       {/* Accent point light for sparkle */}
       <pointLight
         position={[3, 2, 4]}
-        intensity={0.6}
+        intensity={0.9}
         color={'#ff6b6b'}
         distance={10}
         decay={1}
