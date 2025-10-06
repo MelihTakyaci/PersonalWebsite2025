@@ -1,86 +1,75 @@
 'use client'
 
-import { useRef, useEffect, useState, useMemo } from 'react'
-import { useFrame, useThree, extend } from '@react-three/fiber'
+import { useRef, useEffect, useState } from 'react'
+import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
-import { Group, Mesh } from 'three'
+import { Group, Mesh, Object3D, Material, BufferGeometry } from 'three'
 import * as THREE from 'three'
-
-// R3F JSX uyumluluğu
-extend({ Group, Mesh })
 
 // Modeli önceden yükle
 useGLTF.preload('/blackO.glb')
 
 export default function PyraminxModel() {
   const group = useRef<Group>(null)
-  const [isVisible, setIsVisible] = useState(true)
   const { scene } = useGLTF('/blackO.glb')
-  const { camera } = useThree()
 
-  // Sahneyi klonla ve materyalleri okunur hâle getir
-  const clonedScene = useMemo<Group | null>(() => {
-    if (!scene) return null
-    const cloned = scene.clone(true) as Group
+  // Görünürlük state'i: görünmüyorsa animasyonu durduracağız
+  const [isVisible, setIsVisible] = useState(true)
 
-    cloned.traverse((object) => {
-      const mesh = object as Mesh
-      if (!mesh.isMesh) return
+  const clonedScene = useRef<Group | null>(null)
 
-      // Materyali biraz aç: koyu gri + yansıma, çok hafif emissive
-      const apply = (m: any) => {
-        if (!m) return
-        if (m.isMeshStandardMaterial || m.isMeshPhysicalMaterial) {
-          m.color = new THREE.Color('#1e232a')         // siyah yerine koyu gri
-          m.roughness = 0.3
-          m.metalness = 0.55
-          m.envMapIntensity = 1.0
-          if ('clearcoat' in m) {
-            m.clearcoat = 0.5
-            m.clearcoatRoughness = 0.35
-          }
-          m.emissive = new THREE.Color('#0a0a0a')
-          m.emissiveIntensity = 0.08
-          m.needsUpdate = true
-        }
-      }
-
-      if (Array.isArray(mesh.material)) mesh.material.forEach(apply)
-      else apply(mesh.material)
-
-      mesh.frustumCulled = true
-      mesh.geometry?.computeBoundingSphere()
-    })
-
-    return cloned
-  }, [scene])
-
-  // Unmount temizliği
   useEffect(() => {
-    return () => {
-      if (!clonedScene) return
-      clonedScene.traverse((obj) => {
-        const m = obj as Mesh
-        if (m.isMesh) {
-          m.geometry?.dispose()
-          const mat = m.material as any
-          if (Array.isArray(mat)) mat.forEach((x) => x?.dispose?.())
-          else mat?.dispose?.()
+    if (scene && !clonedScene.current) {
+      // GLTF sahnesini klonla (paylaşımlı referanslardan kaçınmak için)
+      clonedScene.current = scene.clone(true) as Group
+
+      clonedScene.current.traverse((object: Object3D) => {
+        if (object instanceof Mesh) {
+          object.frustumCulled = true
+
+          // malzeme güncelle
+          const mat = object.material
+          if (mat) {
+            if (Array.isArray(mat)) mat.forEach((m: Material) => (m.needsUpdate = true))
+            else (mat as Material).needsUpdate = true
+          }
+
+          // geometry varsa bounding sphere hesapla
+          const geo = object.geometry as BufferGeometry | undefined
+          geo?.computeBoundingSphere()
         }
       })
     }
-  }, [clonedScene])
 
-  // Hafif idle hareket (istersen kaldırabilirsin)
+    return () => {
+      // Temizlik: geometry/material dispose
+      if (clonedScene.current) {
+        clonedScene.current.traverse((object: Object3D) => {
+          if (object instanceof Mesh) {
+            const geo = object.geometry as BufferGeometry | undefined
+            geo?.dispose()
+            const mat = object.material
+            if (mat) {
+              if (Array.isArray(mat)) mat.forEach((m: Material) => m.dispose())
+              else (mat as Material).dispose()
+            }
+          }
+        })
+      }
+    }
+  }, [scene])
+
+  // Görünür değilse animasyonu çalıştırma
   useFrame((state, delta) => {
-    if (!group.current) return
+    if (!group.current || !isVisible) return
     const t = state.clock.getElapsedTime() * 0.25
+
     group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, t, 4, delta)
     group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, t * 0.6, 4, delta)
     group.current.position.y = Math.sin(t * 2) * 0.07
   })
 
-  // Görünürlük gözlemcisi (ileride performans için kullanabilirsin)
+  // Canvas görünürlük gözlemcisi
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
@@ -91,19 +80,21 @@ export default function PyraminxModel() {
     return () => observer.disconnect()
   }, [])
 
-  // Yüklenirken basit bir placeholder (artık koyu değil)
-  if (!clonedScene) {
+  if (!clonedScene.current) {
     return (
       <mesh>
         <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="#222" metalness={0.4} roughness={0.4} />
+        <meshStandardMaterial color="#000" />
       </mesh>
     )
   }
 
   return (
-    <group ref={group} scale={0.4} dispose={null}>
-      <primitive object={clonedScene} />
-    </group>
+    <primitive
+      object={clonedScene.current}
+      ref={group}
+      scale={0.4}
+      dispose={null}
+    />
   )
 }
