@@ -127,7 +127,17 @@ No component may hardcode a timing value. Every animation composes from these.
 | `Stagger` | Sequences its children by `stagger` | `children`, `delay?` |
 | `TextReveal` | Drives a heading up line-by-line from behind a mask | `text`, `as?`, `delay?` |
 | `Magnetic` | Element translates toward the cursor (max 6px), springs back | `children`, `strength?` |
-| `ScrollScene` | Maps scroll progress to transforms via `useScroll` + `useSpring` | `children`, `range`, `to` |
+
+**`ScrollScene` was dropped during planning.** It was specified as a fifth
+primitive, but the hero's corner-parking transform is its only consumer, and a
+single-use abstraction is worse than the inline code it hides. The `useScroll` +
+`useSpring` mapping lives directly in `components/Hero.tsx`. Extract it if a
+second scroll-linked scene ever appears.
+
+`Stagger` and `Reveal` are deliberately not composable: framer-motion stops
+propagating variants to a child that declares its own `initial`/`whileInView`, so
+staggered lists use the `Stagger` + `StaggerItem` pair and standalone blocks use
+`Reveal`.
 
 Each primitive reads `usePrefersReducedMotion` internally. This is the only place
 reduced-motion is handled; consumers never check it.
@@ -222,8 +232,9 @@ The pyraminx model and materials are unchanged. Added:
 **New**
 - `lib/motion.ts`
 - `lib/usePrefersReducedMotion.ts`
-- `components/motion/Reveal.tsx`, `Stagger.tsx`, `TextReveal.tsx`, `Magnetic.tsx`, `ScrollScene.tsx`
+- `components/motion/Reveal.tsx`, `Stagger.tsx` (exports `Stagger` + `StaggerItem`), `TextReveal.tsx`, `Magnetic.tsx`
 - `components/SectionHeader.tsx`
+- `components/Hero.tsx` (hero extracted out of `app/page.tsx`, which becomes pure composition)
 
 **Modified**
 - `app/globals.css` (rewritten as the token layer)
