@@ -15,13 +15,14 @@ export default function GitHubCTA() {
         href="https://github.com/MelihTakyaci"
         target="_blank"
         rel="noopener noreferrer"
+        aria-label="View Melih Takyacı's GitHub profile and open source projects"
         whileHover={{
           scale: 1.2,
           y: -4,
           boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.4)",
         }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="relative group inline-flex items-center gap-3 px-6 py-4 rounded-2xl border border-neutral-700 bg-neutral-800/60 hover:bg-neutral-800 transition-all duration-300 shadow-lg backdrop-blur-md"
+        className="relative group inline-flex items-center gap-3 px-6 py-4 rounded-2xl border border-neutral-700 bg-neutral-800/60 hover:bg-neutral-800 transition-all duration-300 shadow-lg backdrop-blur-md min-h-[48px]"
       >
         <motion.div
           whileHover={{ x: 3 }}

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   return NextResponse.json({
-    name: "Melih Takyacı",
+    name: "Melih Takyaci",
     title: "Full-Stack & Embedded Systems Developer",
     website: "https://melihtakyaci.com",
     projects: [

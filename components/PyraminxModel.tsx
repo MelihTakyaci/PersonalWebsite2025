@@ -1,106 +1,71 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
-import { useFrame, useThree, extend } from '@react-three/fiber'
+import { useRef, useEffect } from 'react'
+import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
-import { Group, Mesh } from 'three'
+import { Group, Mesh, EdgesGeometry, LineSegments, LineBasicMaterial } from 'three'
 import * as THREE from 'three'
 
-// ⚠️ CRITICAL FIX: Declare these for R3F JSX compatibility
-extend({ Group, Mesh })
-
-// Preload the model
 useGLTF.preload('/blackO.glb')
 
+// ============================================================================
+// PYRAMINX - Static Display with Subtle Edges
+// ============================================================================
+
 export default function PyraminxModel() {
-  const group = useRef<Group>(null)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isVisible, setIsVisible] = useState(true)
+  const groupRef = useRef<Group>(null!)
   const { scene } = useGLTF('/blackO.glb')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { camera } = useThree()
 
-  const clonedScene = useRef<Group | null>(null)
-
+  // Initialize - just load and style, no animation tracking
   useEffect(() => {
-    if (scene && !clonedScene.current) {
-      clonedScene.current = scene.clone()
+    if (!scene || !groupRef.current) return
 
-      clonedScene.current.traverse((object) => {
-        if (object instanceof Mesh) {
-          object.frustumCulled = true
-          if (object.material) object.material.needsUpdate = true
-          if (object.geometry) object.geometry.computeBoundingSphere()
-        }
-      })
+    // Clear any existing children
+    while (groupRef.current.children.length > 0) {
+      groupRef.current.remove(groupRef.current.children[0])
     }
 
-    return () => {
-      if (clonedScene.current) {
-        clonedScene.current.traverse((object) => {
-          if (object instanceof Mesh) {
-            object.geometry?.dispose()
-            if (Array.isArray(object.material)) {
-              object.material.forEach(m => m.dispose())
-            } else {
-              object.material?.dispose()
-            }
-          }
+    scene.traverse((obj) => {
+      if (obj instanceof Mesh && obj.geometry) {
+        const m = obj.clone() as Mesh
+
+        // Dark satin/semi-gloss material - like the reference image
+        m.material = new THREE.MeshStandardMaterial({
+          color: 0x1a1a1a,
+          metalness: 0.3,
+          roughness: 0.4,
+          emissive: 0x000000,
+          emissiveIntensity: 0,
         })
+
+        // Subtle edge highlight
+        const edges = new EdgesGeometry(obj.geometry, 15)
+        const line = new LineSegments(
+          edges,
+          new LineBasicMaterial({ 
+            color: 0x555555,
+            opacity: 0.4, 
+            transparent: true 
+          })
+        )
+        m.add(line)
+
+        groupRef.current!.add(m)
       }
-    }
+    })
   }, [scene])
 
-  useFrame((state, delta) => {
-    if (!group.current) return
-    const t = state.clock.getElapsedTime() * 0.25
+  // Simple idle rotation - no solve animation
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime()
 
-    group.current.rotation.y = THREE.MathUtils.damp(
-      group.current.rotation.y,
-      t,
-      4,
-      delta,
-    )
-
-    group.current.rotation.x = THREE.MathUtils.damp(
-      group.current.rotation.x,
-      t * 0.6,
-      4,
-      delta,
-    )
-
-    group.current.position.y = Math.sin(t * 2) * 0.07
+    if (groupRef.current) {
+      // Slow continuous rotation
+      groupRef.current.rotation.y = t * 0.08
+      // Gentle floating
+      groupRef.current.position.y = Math.sin(t * 0.4) * 0.02
+    }
   })
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting)
-      },
-      { threshold: 0.1 }
-    )
-
-    const canvas = document.querySelector('canvas')
-    if (canvas) observer.observe(canvas)
-
-    return () => observer.disconnect()
-  }, [])
-
-  if (!clonedScene.current) {
-    return (
-      <mesh>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="#000" />
-      </mesh>
-    )
-  }
-
-  return (
-    <primitive
-      object={clonedScene.current}
-      ref={group}
-      scale={0.4}
-      dispose={null}
-    />
-  )
+  return <group ref={groupRef} scale={0.5} />
 }

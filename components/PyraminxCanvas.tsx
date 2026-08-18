@@ -37,38 +37,32 @@ export default function PyraminxCanvas() {
       dpr={[1, 2]} // Device pixel ratio limits
       performance={{ min: 0.5 }} // Performance degradation threshold
     >
-      {/* Enhanced Lighting setup */}
-      <ambientLight intensity={0.8} color="#f0f8ff" />
+      {/* Subtle lighting for dark glossy look */}
+      <ambientLight intensity={0.15} color="#ffffff" />
       
-      {/* Key light - main illumination */}
-      <directionalLight
-        position={[6, 8, 12]}
-        intensity={2.1}
-        color={'#ffffff'}
-        castShadow
+      {/* Main top light - soft white */}
+      <spotLight
+        position={[0, 10, 5]}
+        angle={0.5}
+        penumbra={0.8}
+        intensity={1.5}
+        color="#ffffff"
       />
       
-      {/* Fill light - reduces harsh shadows */}
+      {/* Fill light from front-left */}
       <directionalLight
-        position={[-4, 3, 8]}
-        intensity={0.9}
-        color={'#e6f3ff'}
+        position={[-5, 5, 10]}
+        intensity={0.8}
+        color="#ffffff"
       />
       
-      {/* Rim light - creates edge definition */}
-      <directionalLight
-        position={[2, 12, -8]}
-        intensity={0.9}
-        color={'#fff5e6'}
-      />
-      
-      {/* Accent point light for sparkle */}
+      {/* Subtle rim light for edge definition */}
       <pointLight
-        position={[3, 2, 4]}
-        intensity={0.9}
-        color={'#ff6b6b'}
-        distance={10}
-        decay={1}
+        position={[5, 0, -5]}
+        intensity={0.5}
+        color="#888888"
+        distance={20}
+        decay={2}
       />
 
       {/* Model without Bounds/Center wrapping */}

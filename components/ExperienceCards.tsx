@@ -61,7 +61,7 @@ function ExperienceCards() {
       className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-8 px-4"
     >
       {projects.map((project, index) => (
-        <motion.div
+        <motion.article
           key={index}
           variants={cardVariants}
           whileHover={{
@@ -77,10 +77,12 @@ function ExperienceCards() {
             <div className="p-4 w-full h-full">
               <Image
                 src={project.image}
-                alt={project.title}
+                alt={`${project.title} - ${project.role} project screenshot`}
                 width={800}
                 height={450}
                 className="w-full h-full object-contain rounded-xl"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                priority={index < 2}
               />
             </div>
           </div>
@@ -91,7 +93,7 @@ function ExperienceCards() {
           <p className="text-neutral-500 text-sm font-light mt-1">
             / {project.period}
           </p>
-        </motion.div>
+        </motion.article>
       ))}
     </motion.div>
   );

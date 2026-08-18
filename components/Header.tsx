@@ -41,35 +41,41 @@ export default function Header() {
             ? 'bg-neutral-900/90 backdrop-blur-xl shadow-md'
             : 'bg-transparent'}
         `}
+        role="banner"
       >
-        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-2 flex justify-between items-center">
+        <nav className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-2 flex justify-between items-center" aria-label="Main navigation">
           <span className="text-sm sm:text-base tracking-wider font-semibold text-neutral-300 uppercase">
             Melih Takyaci
           </span>
 
-          <div className="flex gap-2 sm:gap-4 text-neutral-400 text-xl sm:text-base">
+          <div className="flex gap-2 sm:gap-4 text-neutral-400 text-xl sm:text-base" role="navigation" aria-label="Social media links">
             <a
               href="https://linkedin.com/in/melih-takyaci"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 sm:p-1 hover:text-blue-400 transition"
+              aria-label="Connect with Melih Takyaci on LinkedIn"
+              className="p-2 sm:p-1 hover:text-blue-400 transition min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
-              <FaLinkedin size={20} />
+              <FaLinkedin size={20} aria-hidden="true" />
             </a>
             <a
               href="https://github.com/MelihTakyaci"
-              className="p-2 sm:p-1 hover:text-white transition"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="View Melih Takyaci's GitHub profile"
+              className="p-2 sm:p-1 hover:text-white transition min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
-              <FaGithub size={20} />
+              <FaGithub size={20} aria-hidden="true" />
             </a>
             <a
               href="mailto:melihtakyaci@gmail.com"
-              className="p-2 sm:p-1 hover:text-red-400 transition"
+              aria-label="Send email to Melih Takyaci"
+              className="p-2 sm:p-1 hover:text-red-400 transition min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
-              <FaEnvelope size={18} />
+              <FaEnvelope size={18} aria-hidden="true" />
             </a>
           </div>
-        </div>
+        </nav>
       </motion.header>
     </>
   )

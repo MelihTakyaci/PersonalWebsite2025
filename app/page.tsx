@@ -31,11 +31,12 @@ export default function Home() {
 
         {/* HERO */}
         <section
+          id="about"
           className="flex flex-col-reverse lg:flex-row items-center justify-between px-6 md:mt-20 mt-4"
           aria-labelledby="hero-title"
         >
           {/* Text */}
-          <section className="w-full lg:w-1/2 text-center lg:text-left space-y-6">
+          <div className="w-full lg:w-1/2 text-center lg:text-left space-y-6">
             <motion.h1
               id="hero-title"
               className="text-[clamp(2rem,4vw,3.5rem)] font-extrabold flex justify-center lg:justify-start items-center gap-3 md:mt-0 mt-4 tracking-tight"
@@ -81,7 +82,7 @@ export default function Home() {
                 delaySpeed={1500}
               />
             </motion.p>
-          </section>
+          </div>
 
           {/* Canvas */}
           <div
@@ -104,22 +105,22 @@ export default function Home() {
         </section>
 
         {/* Diğer bölümler */}
-        <section className="mt-16 sm:mt-24" aria-labelledby="carousel-title">
+        <section id="projects" className="mt-16 sm:mt-24" aria-labelledby="carousel-title">
           <h2 id="carousel-title" className="sr-only">Featured Projects</h2>
           <Carousel />
         </section>
 
-        <section className="mt-20 sm:mt-32" aria-labelledby="experience-title">
+        <section id="experience" className="mt-20 sm:mt-32" aria-labelledby="experience-title">
           <h2 id="experience-title" className="sr-only">Experience</h2>
           <ExperienceCards />
         </section>
 
-        <section className="mt-10 sm:mt-16" aria-labelledby="github-title">
+        <section id="github" className="mt-10 sm:mt-16" aria-labelledby="github-title">
           <h2 id="github-title" className="sr-only">GitHub Highlights</h2>
           <GitHubCTA />
         </section>
 
-        <section aria-labelledby="contact-title">
+        <section id="contact" aria-labelledby="contact-title">
           <h2 id="contact-title" className="sr-only">Contact</h2>
           <ContactSection />
         </section>
