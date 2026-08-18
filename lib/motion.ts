@@ -1,7 +1,7 @@
 // lib/motion.ts
 // The single source of every timing value on the site.
 // Nothing in components/ may hardcode a duration, easing, or distance.
-import type { Transition } from 'framer-motion'
+import type { SpringOptions, Transition } from 'framer-motion'
 
 /** Cubic-bezier curves. `enter` is the decelerating curve that gives the
  *  site its calm, settled feel; use it for anything the user sees arrive. */
@@ -11,13 +11,18 @@ export const ease = {
 }
 
 /** Physical response for anything the user is directly manipulating
- *  (hover, pointer tracking, scroll-linked transforms). */
-export const spring: Transition = {
-  type: 'spring',
-  stiffness: 220,
-  damping: 30,
-  mass: 0.9,
-}
+ *  (hover, pointer tracking, scroll-linked transforms).
+ *
+ *  Two exports, one set of constants: framer-motion's `transition` prop wants
+ *  a Transition (which carries `type`), while useSpring() wants SpringOptions
+ *  (which does not). Keep them derived from SPRING so they cannot drift. */
+const SPRING = { stiffness: 220, damping: 30, mass: 0.9 } as const
+
+/** For `transition` props. */
+export const spring: Transition = { type: 'spring', ...SPRING }
+
+/** For useSpring(). */
+export const springOptions: SpringOptions = SPRING
 
 /** Seconds. */
 export const duration = {
