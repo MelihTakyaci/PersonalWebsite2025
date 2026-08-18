@@ -310,7 +310,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} font-sans bg-ink-0 text-fg-2 antialiased`}>
         {/* AI Context Block - Hidden Summary for Web Scrapers & AI Agents */}
         <div className="sr-only" role="presentation" aria-hidden="true">
           <h1>Melih Takyaci - Full-Stack Developer & Embedded Systems Engineer</h1>

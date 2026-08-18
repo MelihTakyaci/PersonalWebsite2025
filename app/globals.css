@@ -1,91 +1,104 @@
 @import "tailwindcss";
 
-@keyframes shine {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 200%;
-  }
-}
-html, body, #__next {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
+@theme {
+  /* Surfaces */
+  --color-ink-0: #08090A;
+  --color-ink-1: #0D0E10;
+  --color-ink-2: #141517;
+  --color-line: rgba(255, 255, 255, 0.08);
 
+  /* Text */
+  --color-fg-1: #F5F5F7;
+  --color-fg-2: #A1A1A6;
+  --color-fg-3: #6E6E73;
 
-.shine-effect::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 35%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.1);
-  transform: rotate(12deg);
-  filter: blur(6px);
-  animation: shine 1.2s ease-in-out forwards;
-}
+  /* State — focus, links, active. Never decorative. */
+  --color-accent: #5B8CFF;
 
-.shine-parent:hover .shine-effect::before {
-  animation: shine 1.2s ease-in-out forwards;
-}
+  /* Fluid type scale */
+  --text-display: clamp(2.75rem, 7vw, 5.5rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.035em;
 
+  --text-h1: clamp(2rem, 4.5vw, 3.25rem);
+  --text-h1--line-height: 1.08;
+  --text-h1--letter-spacing: -0.03em;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --text-h2: clamp(1.375rem, 2.6vw, 1.875rem);
+  --text-h2--line-height: 1.18;
+  --text-h2--letter-spacing: -0.02em;
+
+  --text-lead: clamp(1.0625rem, 1.5vw, 1.25rem);
+  --text-lead--line-height: 1.55;
+  --text-lead--letter-spacing: -0.01em;
+
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.65;
+
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1;
+  --text-label--letter-spacing: 0.14em;
+
+  /* Easing — the CSS twins of ease.enter / ease.exit in lib/motion.ts.
+     Keep these two in sync with that file by hand; they are the same curves. */
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.7, 0, 0.84, 0);
+
+  /* Radius */
+  --radius-sm2: 12px;
+  --radius-card: 18px;
+  --radius-panel: 28px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0E1011;
-    --foreground: #595959;
+/* The one surface recipe. Every panel, card, and pill uses this. */
+@utility surface {
+  background-color: color-mix(in oklab, var(--color-ink-1) 70%, transparent);
+  border: 1px solid var(--color-line);
+  backdrop-filter: blur(20px);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-ink-0);
+    color: var(--color-fg-2);
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-accent) 32%, transparent);
+    color: var(--color-fg-1);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 4px;
   }
 }
 
-*{
-  box-sizing: border-box;
-  pointer-events: unset;
-  --framer-font-family: "Inter-SemiBold", "Inter", sans-serif;
+/* Safety net: clamps Tailwind transition-* classes that the
+   usePrefersReducedMotion hook cannot see. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-.navBar{
-  place-content: center flex-start;
-  align-items: center;
-  display: flex;
-  flex-flow: row;
-  gap: 12px;
-  height: 72px;
-  overflow: visible;
-  padding: 0px 16px 0px 24px;
-  position: relative;
-  --border-bottom-width: 0px;
-  --border-color: rgba(0, 0, 0, 0);
-  --border-left-width: 0px;
-  --border-right-width: 0px;
-  --border-style: solid;
-  --border-top-width: 0px;
-  backdrop-filter: blur(20px);
-  background-color: rgb(15, 16, 16);
-  width: 100%;
-  opacity: 1;
-  border-radius: 20px;
-  box-shadow: none;
-  justify-content: space-between;
-  max-width: 90%;
-}
-
