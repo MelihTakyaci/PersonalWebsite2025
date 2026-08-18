@@ -12,7 +12,7 @@ useGLTF.preload('/blackO.glb')
 // PYRAMINX - Static Display with Subtle Edges
 // ============================================================================
 
-export default function PyraminxModel() {
+export default function PyraminxModel({ animate }: { animate: boolean }) {
   const groupRef = useRef<Group>(null!)
   const { scene } = useGLTF('/blackO.glb')
 
@@ -55,17 +55,28 @@ export default function PyraminxModel() {
     })
   }, [scene])
 
-  // Simple idle rotation - no solve animation
-  useFrame((state) => {
+  const BASE_SCALE = 0.5
+
+  useFrame((state, delta) => {
+    const group = groupRef.current
+    if (!group) return
+
     const t = state.clock.getElapsedTime()
 
-    if (groupRef.current) {
-      // Slow continuous rotation
-      groupRef.current.rotation.y = t * 0.08
-      // Gentle floating
-      groupRef.current.position.y = Math.sin(t * 0.4) * 0.02
-    }
+    // Entrance: 0.85 -> 1 over 1.2s on an ease-out cubic.
+    const intro = Math.min(1, t / 1.2)
+    const eased = 1 - Math.pow(1 - intro, 3)
+    group.scale.setScalar(BASE_SCALE * (0.85 + 0.15 * eased))
+
+    if (!animate) return
+
+    group.rotation.y = t * 0.08
+    group.position.y = Math.sin(t * 0.4) * 0.02
+
+    // Damped tilt toward the pointer.
+    const targetTilt = state.pointer.y * 0.12
+    group.rotation.x += (targetTilt - group.rotation.x) * Math.min(1, delta * 3)
   })
 
-  return <group ref={groupRef} scale={0.5} />
+  return <group ref={groupRef} />
 }
