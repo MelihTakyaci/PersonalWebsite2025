@@ -1,102 +1,68 @@
-"use client";
-import Image from 'next/image';
-import { motion } from 'framer-motion';
+'use client'
+
+import Image from 'next/image'
+import { Stagger, StaggerItem } from '@/components/motion/Stagger'
 
 const projects = [
   {
     title: 'Kindle Style Mobile App',
     role: 'Full-Stack Developer',
     period: '2025',
-    gradient: 'from-purple-500 via-indigo-500 to-blue-500',
     image: '/Experience/Mobile.PNG',
   },
   {
-    title: 'E-commerce platform with CMS 🌍',
-    role: 'Full Stack Developer',
+    title: 'E-commerce Platform with CMS',
+    role: 'Full-Stack Developer',
     period: '2024',
-    gradient: 'from-green-400 via-lime-400 to-yellow-300',
     image: '/Experience/ecommerce.png',
   },
   {
     title: 'Marketing Website',
     role: 'UI Developer',
     period: '2025',
-    gradient: 'from-sky-500 via-cyan-400 to-emerald-400',
     image: '/Experience/Destani.png',
   },
   {
     title: 'NGO Website',
-    role: 'Full Stack Developer',
+    role: 'Full-Stack Developer',
     period: '2024',
-    gradient: 'from-pink-400 via-red-400 to-orange-300',
     image: '/Experience/KotgepWeb.png',
   },
-];
+]
 
-// Animasyon variantları
-const cardVariants = {
-  offscreen: {
-    opacity: 0,
-    scale: 0.9,
-    y: 40,
-  },
-  onscreen: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: {
-      type: 'spring',
-      bounce: 0.2,
-      duration: 0.8,
-    },
-  },
-};
-
-function ExperienceCards() {
+export default function ExperienceCards() {
   return (
-    <motion.div
-      initial="offscreen"
-      whileInView="onscreen"
-      viewport={{ once: true, amount: 0.1 }}
-      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-8 px-4"
-    >
+    <Stagger className="grid grid-cols-1 gap-5 sm:grid-cols-2">
       {projects.map((project, index) => (
-        <motion.article
-          key={index}
-          variants={cardVariants}
-          whileHover={{
-            scale: 1.03,
-            y: -5,
-            transition: { duration: 0.3 },
-          }}
-          className="bg-neutral-900 rounded-3xl p-6 shadow-xl"
+        <StaggerItem
+          as="article"
+          key={project.title}
+          className="surface group rounded-panel p-3"
         >
-          <div
-            className={`w-full aspect-video rounded-2xl bg-gradient-to-br ${project.gradient} overflow-hidden flex items-center justify-center`}
-          >
-            <div className="p-4 w-full h-full">
-              <Image
-                src={project.image}
-                alt={`${project.title} - ${project.role} project screenshot`}
-                width={800}
-                height={450}
-                className="w-full h-full object-contain rounded-xl"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                priority={index < 2}
-              />
-            </div>
+          <div className="aspect-video overflow-hidden rounded-card bg-ink-2 p-4">
+            <Image
+              src={project.image}
+              alt={`${project.title} — ${project.role} project screenshot`}
+              width={800}
+              height={450}
+              sizes="(max-width: 640px) 100vw, 50vw"
+              priority={index < 2}
+              className="h-full w-full rounded-sm2 object-contain transition-transform
+                duration-700 ease-enter group-hover:scale-[1.04]"
+            />
           </div>
-          <h3 className="text-xl font-medium text-white mt-4">
-            {project.title}
-          </h3>
-          <p className="text-neutral-400 text-sm font-light">{project.role}</p>
-          <p className="text-neutral-500 text-sm font-light mt-1">
-            / {project.period}
-          </p>
-        </motion.article>
-      ))}
-    </motion.div>
-  );
-}
 
-export default ExperienceCards;
+          <div className="flex items-baseline justify-between gap-4 px-3 pb-2 pt-5">
+            <div>
+              <h3 className="text-h2 font-medium text-fg-1">{project.title}</h3>
+              <p className="mt-1 text-body text-fg-2">{project.role}</p>
+            </div>
+            <span className="font-mono text-label uppercase text-fg-3">
+              {project.period}
+            </span>
+          </div>
+        </StaggerItem>
+      ))}
+    </Stagger>
+  )
+}

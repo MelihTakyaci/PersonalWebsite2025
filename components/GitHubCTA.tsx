@@ -1,45 +1,25 @@
-"use client";
-import { motion } from "framer-motion";
-import { FaGithub } from "react-icons/fa";
+'use client'
+
+import { FaGithub } from 'react-icons/fa'
+import Magnetic from '@/components/motion/Magnetic'
+import Reveal from '@/components/motion/Reveal'
 
 export default function GitHubCTA() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
-      className="mt-16 sm:mt-24 px-6 flex justify-center"
-    >
-      <motion.a
-        href="https://github.com/MelihTakyaci"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="View Melih Takyacı's GitHub profile and open source projects"
-        whileHover={{
-          scale: 1.2,
-          y: -4,
-          boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.4)",
-        }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="relative group inline-flex items-center gap-3 px-6 py-4 rounded-2xl border border-neutral-700 bg-neutral-800/60 hover:bg-neutral-800 transition-all duration-300 shadow-lg backdrop-blur-md min-h-[48px]"
-      >
-        <motion.div
-          whileHover={{ x: 3 }}
-          transition={{ type: "spring", stiffness: 200 }}
+    <Reveal className="flex justify-center">
+      <Magnetic className="inline-block">
+        <a
+          href="https://github.com/MelihTakyaci"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="View Melih Takyaci's GitHub profile and open source projects"
+          className="surface inline-flex min-h-[48px] items-center gap-3 rounded-full px-7 py-4
+            text-fg-1 transition-colors duration-300 hover:bg-ink-2"
         >
-          <FaGithub className="text-white text-2xl" />
-        </motion.div>
-        <motion.span
-          whileHover={{ scale: 1.07 }}
-          transition={{ duration: 0.125 }}
-          className="text-white text-lg font-medium"
-        >
-          See more on GitHub
-        </motion.span>
-
-
-      </motion.a>
-    </motion.div>
-  );
+          <FaGithub className="text-xl" aria-hidden="true" />
+          <span className="text-body font-medium">See more on GitHub</span>
+        </a>
+      </Magnetic>
+    </Reveal>
+  )
 }

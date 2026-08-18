@@ -1,82 +1,68 @@
-'use client';
+'use client'
 
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { useState } from 'react';
+import Image from 'next/image'
+import { useState } from 'react'
+import Reveal from '@/components/motion/Reveal'
+import { Stagger, StaggerItem } from '@/components/motion/Stagger'
+
+const channels = [
+  { label: 'Email', value: 'melihtakyaci@gmail.com', href: 'mailto:melihtakyaci@gmail.com', external: false },
+  { label: 'LinkedIn', value: 'linkedin.com/in/melihtakyaci', href: 'https://linkedin.com/in/melih-takyaci', external: true },
+  { label: 'GitHub', value: 'github.com/MelihTakyaci', href: 'https://github.com/MelihTakyaci', external: true },
+]
 
 export default function ContactSection() {
-  const [hovered, setHovered] = useState(false);
+  const [hovered, setHovered] = useState(false)
 
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      viewport={{ once: true }}
-      className="py-24 px-4 sm:px-8 flex flex-col items-center text-center"
-    >
-      <div
-        className="text-3xl sm:text-5xl font-semibold text-white mb-6 flex items-center gap-3"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        <motion.div
-          className="relative w-20 h-20"
-          animate={{ scale: hovered ? 1.05 : 1, rotate: hovered ? 5 : 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+    <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
+      <Reveal className="md:col-span-5">
+        <div
+          className="relative h-24 w-24"
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
         >
-          {/* Base Image */}
           <Image
             src="/default.png"
-            height={500} width={500}
-            alt="Default Memoji"
-            className={`rounded-full object-contain transition-opacity duration-500 w-20 ${hovered ? 'opacity-0' : 'opacity-100'}`}
+            width={500}
+            height={500}
+            alt="Melih Takyaci memoji"
+            className={`h-24 w-24 rounded-full object-contain transition-opacity duration-500
+              ${hovered ? 'opacity-0' : 'opacity-100'}`}
           />
-          {/* Hover Image */}
           <Image
             src="/dyes.png"
-            height={500} width={500}
-            alt="Hover Memoji"
-            className={`rounded-full object-contain transition-opacity duration-500 absolute top-0 left-0 w-30 ${hovered ? 'opacity-100' : 'opacity-0'}`}
+            width={500}
+            height={500}
+            alt=""
+            aria-hidden="true"
+            className={`absolute left-0 top-0 h-24 w-24 rounded-full object-contain
+              transition-opacity duration-500 ${hovered ? 'opacity-100' : 'opacity-0'}`}
           />
-        </motion.div>
-        <span>get in touch</span>
-      </div>
+        </div>
 
-      <p className="text-neutral-400 text-base sm:text-lg max-w-xl mb-8">
-        Always open to exciting ideas, freelance collaborations, or just geeking out over tech ☕
-      </p>
+        <p className="mt-8 max-w-md text-lead text-fg-2">
+          Always open to exciting ideas, freelance collaborations, or just geeking out over tech.
+        </p>
+      </Reveal>
 
-      <div className="space-y-3 text-sm sm:text-base text-neutral-300">
-        <p>
-          📧 <a
-            href="mailto:melihtakyaci@gmail.com"
-            className=" hover:text-blue-400 transition"
-          >
-            melihtakyaci@gmail.com
-          </a>
-        </p>
-        <p>
-          💼 <a
-            href="https://linkedin.com/in/melih-takyaci"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-blue-400 transition"
-          >
-            linkedin.com/in/melihtakyaci
-          </a>
-        </p>
-        <p>
-          💻 <a
-            href="https://github.com/MelihTakyaci"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-purple-400 transition"
-          >
-            github.com/MelihTakyaci
-          </a>
-        </p>
-      </div>
-    </motion.section>
-  );
+      <Stagger as="ul" className="border-b border-line md:col-span-7">
+        {channels.map(({ label, value, href, external }) => (
+          <StaggerItem as="li" key={label} className="group border-t border-line">
+            <a
+              href={href}
+              {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              className="flex items-baseline justify-between gap-6 py-6 transition-colors
+                hover:text-accent"
+            >
+              <span className="font-mono text-label uppercase text-fg-3">{label}</span>
+              <span className="text-body text-fg-1 transition-colors group-hover:text-accent">
+                {value}
+              </span>
+            </a>
+          </StaggerItem>
+        ))}
+      </Stagger>
+    </div>
+  )
 }
