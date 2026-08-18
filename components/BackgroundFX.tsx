@@ -1,12 +1,11 @@
 'use client'
 import { memo } from 'react'
 
-/** 
- * Aurora + Grain + Vignette – tamamen CSS tabanlı, ekstra dosya yok.
- * pointer-events-none: tıklamaları engellemez.
+/**
+ * Page ground: one low-opacity cool glow behind the hero, plus grain
+ * and a bottom vignette. Fixed, so it covers the full scroll height.
  */
 function BackgroundFX() {
-  // Base64 SVG noise (çok hafif)
   const NOISE =
     "url(\"data:image/svg+xml;utf8,\
 <svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'>\
@@ -15,30 +14,27 @@ function BackgroundFX() {
 </svg>\")"
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {/* 1) Ana degrade */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-neutral-950 to-black" />
+    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      {/* Ground */}
+      <div className="absolute inset-0 bg-ink-0" />
 
-      {/* 2) Aurora (çok düşük opaklıkta iki büyük radial gradient) */}
-      <div className="
-        absolute inset-0 opacity-60
-        bg-[radial-gradient(1200px_600px_at_8%_-10%,rgba(120,120,255,0.18),transparent_60%),
-            radial-gradient(900px_500px_at_92%_6%,rgba(255,120,200,0.16),transparent_65%),
-            radial-gradient(700px_400px_at_40%_110%,rgba(120,255,200,0.10),transparent_60%)]
-      " />
-
-      {/* 3) Vignette (üst tarafı daha koyu) */}
-      <div className="
-        absolute inset-0
-        [mask-image:radial-gradient(60%_40%_at_50%_20%,black_30%,transparent_100%)]
-        bg-[linear-gradient(to_bottom,rgba(0,0,0,0.55),transparent_35%)]
-        mix-blend-multiply
-      " />
-
-      {/* 4) Noise (grain) */}
+      {/* One glow, tinted toward the accent, at the top of the page. */}
       <div
-        className="absolute inset-0"
-        style={{ backgroundImage: NOISE, backgroundRepeat: 'repeat', backgroundSize: '140px 140px' }}
+        className="absolute inset-0
+          bg-[radial-gradient(1100px_620px_at_50%_-15%,rgba(91,140,255,0.10),transparent_62%)]"
+      />
+
+      {/* Vignette toward the bottom. */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_55%,rgba(0,0,0,0.55))]" />
+
+      {/* Grain */}
+      <div
+        className="absolute inset-0 opacity-[0.5]"
+        style={{
+          backgroundImage: NOISE,
+          backgroundRepeat: 'repeat',
+          backgroundSize: '140px 140px',
+        }}
       />
     </div>
   )

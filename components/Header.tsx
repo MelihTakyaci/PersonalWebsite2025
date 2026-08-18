@@ -3,80 +3,83 @@
 import { useEffect, useState } from 'react'
 import { FaLinkedin, FaEnvelope, FaGithub } from 'react-icons/fa'
 import { motion } from 'framer-motion'
+import { duration, ease } from '@/lib/motion'
 
-const HEADER_H = 64 // px
+const LINKS = [
+  {
+    href: 'https://linkedin.com/in/melih-takyaci',
+    label: 'Connect with Melih Takyaci on LinkedIn',
+    Icon: FaLinkedin,
+    external: true,
+  },
+  {
+    href: 'https://github.com/MelihTakyaci',
+    label: "View Melih Takyaci's GitHub profile",
+    Icon: FaGithub,
+    external: true,
+  },
+  {
+    href: 'mailto:melihtakyaci@gmail.com',
+    label: 'Send email to Melih Takyaci',
+    Icon: FaEnvelope,
+    external: false,
+  },
+]
 
 export default function Header() {
-  const [scrolled, setScrolled] = useState(false)
+  const [condensed, setCondensed] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10)
-    window.addEventListener('scroll', onScroll)
-
-    // 👇 Sayfa ilk açıldığında scroll tetikle
-    setTimeout(() => {
-      window.scrollTo(0, 1)
-      window.scrollTo(0, 0)
-    }, 50)
-
+    const onScroll = () => setCondensed(window.scrollY > 24)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   return (
-    <>
-      {/* GHOST: akışta yer tutar */}
-      <div style={{ height: HEADER_H }} />
-
-      {/* Gerçek header her zaman fixed */}
-      <motion.header
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className={`
-          fixed top-0 left-0 right-0 z-50
-          h-[${HEADER_H}px]
-          flex items-center
-          transition-colors duration-300
-          ${scrolled
-            ? 'bg-neutral-900/90 backdrop-blur-xl shadow-md'
-            : 'bg-transparent'}
-        `}
-        role="banner"
+    <motion.header
+      role="banner"
+      initial={{ y: -16, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: duration.lg, ease: ease.enter }}
+      className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-3 sm:pt-4"
+    >
+      <motion.nav
+        aria-label="Main navigation"
+        animate={{
+          maxWidth: condensed ? 560 : 1280,
+          paddingLeft: condensed ? 20 : 16,
+          paddingRight: condensed ? 20 : 16,
+        }}
+        transition={{ duration: duration.md, ease: ease.enter }}
+        className={`flex h-14 w-full items-center justify-between rounded-full
+          transition-[background-color,border-color,box-shadow] duration-300
+          ${condensed
+            ? 'surface shadow-[0_8px_32px_rgba(0,0,0,0.45)]'
+            : 'border border-transparent bg-transparent'}`}
       >
-        <nav className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-2 flex justify-between items-center" aria-label="Main navigation">
-          <span className="text-sm sm:text-base tracking-wider font-semibold text-neutral-300 uppercase">
-            Melih Takyaci
-          </span>
+        <a
+          href="#about"
+          className="font-mono text-label uppercase text-fg-2 transition-colors hover:text-fg-1"
+        >
+          Melih Takyaci
+        </a>
 
-          <div className="flex gap-2 sm:gap-4 text-neutral-400 text-xl sm:text-base" role="navigation" aria-label="Social media links">
+        <div className="flex items-center gap-1">
+          {LINKS.map(({ href, label, Icon, external }) => (
             <a
-              href="https://linkedin.com/in/melih-takyaci"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Connect with Melih Takyaci on LinkedIn"
-              className="p-2 sm:p-1 hover:text-blue-400 transition min-w-[44px] min-h-[44px] flex items-center justify-center"
+              key={href}
+              href={href}
+              aria-label={label}
+              {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full
+                text-fg-3 transition-colors hover:text-fg-1"
             >
-              <FaLinkedin size={20} aria-hidden="true" />
+              <Icon size={17} aria-hidden="true" />
             </a>
-            <a
-              href="https://github.com/MelihTakyaci"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="View Melih Takyaci's GitHub profile"
-              className="p-2 sm:p-1 hover:text-white transition min-w-[44px] min-h-[44px] flex items-center justify-center"
-            >
-              <FaGithub size={20} aria-hidden="true" />
-            </a>
-            <a
-              href="mailto:melihtakyaci@gmail.com"
-              aria-label="Send email to Melih Takyaci"
-              className="p-2 sm:p-1 hover:text-red-400 transition min-w-[44px] min-h-[44px] flex items-center justify-center"
-            >
-              <FaEnvelope size={18} aria-hidden="true" />
-            </a>
-          </div>
-        </nav>
-      </motion.header>
-    </>
+          ))}
+        </div>
+      </motion.nav>
+    </motion.header>
   )
 }
