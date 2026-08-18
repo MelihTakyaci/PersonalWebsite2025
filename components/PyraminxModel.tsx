@@ -59,11 +59,19 @@ export default function PyraminxModel({ animate }: { animate: boolean }) {
 
   const BASE_SCALE = 0.5
 
-  useFrame((state, delta) => {
+  // Local time accumulator. R3F's setFrameloop resets clock.elapsedTime to 0
+  // every time the frameloop changes, so driving rotation or the entrance off
+  // state.clock would snap the model back to its start pose each time the
+  // scene scrolls out of view and returns.
+  const elapsed = useRef(0)
+
+  useFrame((_state, delta) => {
     const group = groupRef.current
     if (!group) return
 
-    const t = state.clock.getElapsedTime()
+    // Clamp so a long pause or a dropped frame cannot jump the animation.
+    elapsed.current += Math.min(delta, 1 / 30)
+    const t = elapsed.current
 
     // Entrance: 0.85 -> 1 over 1.2s on an ease-out cubic.
     const intro = Math.min(1, t / 1.2)
@@ -76,7 +84,7 @@ export default function PyraminxModel({ animate }: { animate: boolean }) {
     group.position.y = Math.sin(t * 0.4) * 0.02
 
     // Damped tilt toward the pointer.
-    const targetTilt = state.pointer.y * 0.12
+    const targetTilt = _state.pointer.y * 0.12
     group.rotation.x += (targetTilt - group.rotation.x) * Math.min(1, delta * 3)
   })
 
