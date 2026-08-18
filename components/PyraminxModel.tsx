@@ -42,10 +42,12 @@ export default function PyraminxModel({ animate }: { animate: boolean }) {
         const edges = new EdgesGeometry(obj.geometry, 15)
         const line = new LineSegments(
           edges,
-          new LineBasicMaterial({ 
-            color: 0x555555,
-            opacity: 0.4, 
-            transparent: true 
+          new LineBasicMaterial({
+            // Brightened so the near-black body still reads as a wireframe
+            // object against the neutral #08090A ground.
+            color: 0x9aa0a8,
+            opacity: 0.75,
+            transparent: true
           })
         )
         m.add(line)
