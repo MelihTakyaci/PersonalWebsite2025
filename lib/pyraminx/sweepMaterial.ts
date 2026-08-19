@@ -43,7 +43,7 @@ export function createSweepMaterial(): SweepMaterial {
     uFrequency: { value: 0.28 },
     uSpeed: { value: 1.1 },
     uSharpness: { value: 1.0 },
-    uIntensity: { value: 0.3 },
+    uIntensity: { value: 0.18 },
     uColour: { value: new THREE.Color(0xf5f5f7) },
     uDirection: { value: new THREE.Vector3(0, 1, 0) },
   }

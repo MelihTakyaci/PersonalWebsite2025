@@ -267,7 +267,7 @@ across a face instead of collecting on its edges.
 
 Defaults: bands travel along `+Y`, `uFrequency 0.28` (roughly one broad lobe
 across the model), `uSpeed 1.1`, `uSharpness 1.0` (the softest lobe available —
-raise it to tighten), `uIntensity 0.3`, colour `#F5F5F7`.
+raise it to tighten), `uIntensity 0.18`, colour `#F5F5F7`.
 - `uTime` is advanced from the same local accumulator that drives the idle
   rotation, so it freezes with the rest under reduced motion.
 
