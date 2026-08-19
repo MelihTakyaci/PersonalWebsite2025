@@ -11,6 +11,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { buildPuzzle, currentCentroid } from '../lib/pyraminx/pieces.ts'
 import { AXES, AXIS_NAMES, applyMove, layerMembers, scramble, solutionFor } from '../lib/pyraminx/moves.ts'
+import { createSweepMaterial } from '../lib/pyraminx/sweepMaterial.ts'
 
 const EPS = 1e-6
 const failures = []
@@ -151,6 +152,33 @@ puzzle.pieces.forEach((piece, i) => {
   worstDrift = Math.max(worstDrift, maxMatrixDelta(piece.object.matrix, solved[i]))
 })
 check('6. Birikme yok: 500 hamle + tersi = başlangıç', worstDrift <= EPS, `en kötü sapma ${worstDrift.toExponential(2)}`)
+
+// 7 — shader wiring. onBeforeCompile edits three's source by string match, so a
+//     renamed chunk would silently no-op and the sweep would simply never
+//     appear. Assert every anchor exists exactly once and every injection lands.
+{
+  const lib = THREE.ShaderLib.physical
+  const anchors = [
+    ['vertex', lib.vertexShader, '#include <common>'],
+    ['vertex', lib.vertexShader, '#include <begin_vertex>'],
+    ['fragment', lib.fragmentShader, '#include <common>'],
+    ['fragment', lib.fragmentShader, '#include <emissivemap_fragment>'],
+  ]
+  const anchorsOk = anchors.every(([, src, needle]) => src.split(needle).length - 1 === 1)
+
+  const sweepMaterial = createSweepMaterial()
+  const shader = { uniforms: {}, vertexShader: lib.vertexShader, fragmentShader: lib.fragmentShader }
+  sweepMaterial.onBeforeCompile(shader)
+  const injected =
+    shader.vertexShader.includes('varying vec3 vSweepWorld;') &&
+    shader.vertexShader.includes('vSweepWorld = (modelMatrix') &&
+    shader.fragmentShader.includes('uniform float uTime;') &&
+    shader.fragmentShader.includes('totalEmissiveRadiance += band') &&
+    'uTime' in shader.uniforms &&
+    sweepMaterial.vertexColors === true
+
+  check('7. Shader bağlantısı: enjeksiyon noktaları var ve uygulanıyor', anchorsOk && injected)
+}
 
 // Informational: the asset's pieces are not congruent, so a scrambled pose
 // carries a little modelling variation. Not an engine property — reported so a
