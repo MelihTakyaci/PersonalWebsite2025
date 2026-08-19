@@ -13,6 +13,8 @@ export interface SweepUniforms {
   /** Lobe exponent. 1.0 is a pure raised cosine — the softest shape there is;
    *  higher values pull the light into a tighter, harder band. */
   uSharpness: { value: number }
+  /** Peak highlight as a fraction of the surface's own albedo, not an absolute
+   *  radiance — the sweep is multiplied by diffuseColor. */
   uIntensity: { value: number }
   uColour: { value: THREE.Color }
   /** Direction the bands travel, world space. */
@@ -43,7 +45,7 @@ export function createSweepMaterial(): SweepMaterial {
     uFrequency: { value: 0.28 },
     uSpeed: { value: 1.1 },
     uSharpness: { value: 1.0 },
-    uIntensity: { value: 0.18 },
+    uIntensity: { value: 0.55 },
     uColour: { value: new THREE.Color(0xf5f5f7) },
     uDirection: { value: new THREE.Vector3(0, 1, 0) },
   }
@@ -99,7 +101,16 @@ uniform vec3 uDirection;`
   // Weighted toward the broad term rather than the rim, so the band spreads
   // across a face instead of collecting on its edges.
   float light = band * mix(0.55, 1.0, facing) * (0.6 + 0.4 * fresnel);
-  totalEmissiveRadiance += light * uIntensity * uColour;
+
+  // Reflect off the surface rather than replacing it. Adding a flat white
+  // emissive to a near-black material swamps it: at the previous setting the
+  // band peaked at 2.2x the brightest face's albedo and 13x the darkest, which
+  // is what washed every face out and flattened the luminance ramp along with
+  // it. Scaling by diffuseColor makes each face lift in proportion to what it
+  // already is, the way a real highlight does. The small floor keeps the
+  // darkest face from dropping out of the sweep entirely.
+  vec3 reflected = diffuseColor.rgb + vec3(0.004);
+  totalEmissiveRadiance += light * uIntensity * uColour * reflected;
 }`
       )
   }

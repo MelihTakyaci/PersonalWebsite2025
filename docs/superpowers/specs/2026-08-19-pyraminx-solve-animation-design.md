@@ -240,9 +240,19 @@ float band  = 0.6 * lobe + 0.4 * under;
 float facing  = clamp(dot(vSweepNormal, uDirection) * 0.5 + 0.5, 0.0, 1.0);
 float fresnel = pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 1.8);
 
+vec3 reflected = diffuseColor.rgb + vec3(0.004);
 totalEmissiveRadiance += band * mix(0.55, 1.0, facing)
-                       * (0.6 + 0.4 * fresnel) * uIntensity * uColour;
+                       * (0.6 + 0.4 * fresnel) * uIntensity * uColour * reflected;
 ```
+
+**The sweep multiplies the surface, it does not add to it.** Added as a flat
+white emissive it peaked at 2.2x the brightest face's albedo and 13x the
+darkest — the material is near-black, so any absolute radiance swamps it, washes
+the faces out, and erases the luminance ramp that makes the solve readable.
+Dimming inside that scale could not fix it. Scaling by `diffuseColor` makes each
+face lift in proportion to what it already is: the peak now sits between 0.37x
+and 0.55x of a face's own albedo. `uIntensity` is therefore a fraction of the
+surface, not a radiance.
 
 The band must behave like light, not like paint. Two earlier shapes were built
 and rejected on sight:
@@ -267,7 +277,7 @@ across a face instead of collecting on its edges.
 
 Defaults: bands travel along `+Y`, `uFrequency 0.28` (roughly one broad lobe
 across the model), `uSpeed 1.1`, `uSharpness 1.0` (the softest lobe available —
-raise it to tighten), `uIntensity 0.18`, colour `#F5F5F7`.
+raise it to tighten), `uIntensity 0.55` (of the surface's own albedo), colour `#F5F5F7`.
 - `uTime` is advanced from the same local accumulator that drives the idle
   rotation, so it freezes with the rest under reduced motion.
 
