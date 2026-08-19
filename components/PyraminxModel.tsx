@@ -55,6 +55,31 @@ export default function PyraminxModel({ animate }: { animate: boolean }) {
         groupRef.current!.add(m)
       }
     })
+
+    // The GLB's meshes sit ~1.05 units off the origin in Z (and 0.75 in Y),
+    // so rotation.y swings the model around a circle of that radius instead of
+    // spinning it in place — it drifts sideways and only returns to its
+    // starting pose after a full revolution (~78s). Re-centre the children on
+    // the assembled bounds so the pivot is the model's own centre.
+    //
+    // Measured in the group's local space (geometry bounds x local matrix)
+    // rather than with Box3.setFromObject, because useFrame may already have
+    // applied a scale and rotation to the group by the time this runs.
+    const bounds = new THREE.Box3()
+    const meshBounds = new THREE.Box3()
+    for (const child of groupRef.current.children) {
+      const mesh = child as Mesh
+      if (!mesh.geometry) continue
+      mesh.geometry.computeBoundingBox()
+      if (!mesh.geometry.boundingBox) continue
+      mesh.updateMatrix()
+      meshBounds.copy(mesh.geometry.boundingBox).applyMatrix4(mesh.matrix)
+      bounds.union(meshBounds)
+    }
+    if (!bounds.isEmpty()) {
+      const centre = bounds.getCenter(new THREE.Vector3())
+      for (const child of groupRef.current.children) child.position.sub(centre)
+    }
   }, [scene])
 
   const BASE_SCALE = 0.5
