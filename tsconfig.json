@@ -10,6 +10,9 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
+    // Lets lib/pyraminx/* import each other with explicit .ts specifiers, which is
+    // what makes those modules runnable under Node for scripts/verify-pyraminx.mjs.
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,

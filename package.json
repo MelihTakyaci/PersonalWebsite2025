@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postbuild": "next-sitemap"
+    "postbuild": "next-sitemap",
+    "verify:pyraminx": "node scripts/verify-pyraminx.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.0.8",
