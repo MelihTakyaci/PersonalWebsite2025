@@ -10,7 +10,7 @@ export interface SweepUniforms {
   uFrequency: { value: number }
   /** Cycles per second. */
   uSpeed: { value: number }
-  /** Gaussian half-width, in cycles. Larger is softer and wider. */
+  /** Gaussian half-width, in cycles. Larger is softer and more diffuse. */
   uWidth: { value: number }
   uIntensity: { value: number }
   uColour: { value: THREE.Color }
@@ -38,10 +38,10 @@ export function createSweepMaterial(): SweepMaterial {
 
   const sweep: SweepUniforms = {
     uTime: { value: 0 },
-    uFrequency: { value: 0.6 },
-    uSpeed: { value: 1.6 },
-    uWidth: { value: 0.09 },
-    uIntensity: { value: 0.55 },
+    uFrequency: { value: 0.4 },
+    uSpeed: { value: 1.35 },
+    uWidth: { value: 0.22 },
+    uIntensity: { value: 0.28 },
     uColour: { value: new THREE.Color(0xf5f5f7) },
     uDirection: { value: new THREE.Vector3(0, 1, 0) },
   }
@@ -87,9 +87,11 @@ uniform vec3 uDirection;`
   float band = exp(-(offset * offset) / (uWidth * uWidth));
 
   float facing = clamp(dot(vSweepNormal, uDirection) * 0.5 + 0.5, 0.0, 1.0);
-  float fresnel = pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 2.5);
+  float fresnel = pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 1.8);
 
-  float light = band * mix(0.3, 1.0, facing) * (0.25 + 0.75 * fresnel);
+  // Weighted toward the broad term rather than the rim, so the band spreads
+  // across a face instead of collecting on its edges.
+  float light = band * mix(0.55, 1.0, facing) * (0.6 + 0.4 * fresnel);
   totalEmissiveRadiance += light * uIntensity * uColour;
 }`
       )

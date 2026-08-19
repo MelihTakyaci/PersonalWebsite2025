@@ -12,6 +12,13 @@ useGLTF.preload('/black.glb')
 
 const BASE_SCALE = 0.5
 
+/** Radians per second of yaw. */
+const YAW_SPEED = 0.075
+/** Settled elevation, so the model is seen slightly from above. */
+const RESTING_TILT = -0.22
+/** How far the pointer can lean it, on top of the resting pose. */
+const POINTER_TILT = 0.1
+
 // ============================================================================
 // PYRAMINX — 14 pieces that scramble and solve on a loop
 // ============================================================================
@@ -25,6 +32,9 @@ export default function PyraminxModel({ animate }: { animate: boolean }) {
   // every time the frameloop changes, so driving anything off state.clock would
   // snap the model back each time the scene scrolls out of view and returns.
   const elapsed = useRef(0)
+  // Damped separately from group.rotation.x, which now also carries the resting
+  // tilt and the slow oscillation; damping the rotation itself would fight them.
+  const pointerTilt = useRef(0)
 
   const { scene } = useGLTF('/black.glb')
   const material = useMemo(() => createSweepMaterial(), [])
@@ -77,12 +87,16 @@ export default function PyraminxModel({ animate }: { animate: boolean }) {
     material.sweep.uTime.value = t
     engineRef.current?.update(step)
 
-    group.rotation.y = t * 0.08
-    group.position.y = Math.sin(t * 0.4) * 0.02
+    // Pose. A constant yaw at a fixed elevation shows the same silhouette
+    // forever; the two slow, mutually prime oscillations keep tipping the model
+    // so different faces come into the light, and the resting tilt frames it
+    // the way a product shot would rather than edge-on.
+    pointerTilt.current += (state.pointer.y * POINTER_TILT - pointerTilt.current) * Math.min(1, delta * 3)
 
-    // Damped tilt toward the pointer.
-    const targetTilt = state.pointer.y * 0.12
-    group.rotation.x += (targetTilt - group.rotation.x) * Math.min(1, delta * 3)
+    group.rotation.y = t * YAW_SPEED
+    group.rotation.x = RESTING_TILT + Math.sin(t * 0.19) * 0.09 + pointerTilt.current
+    group.rotation.z = Math.sin(t * 0.13) * 0.05
+    group.position.y = Math.sin(t * 0.35) * 0.03
   })
 
   return <group ref={groupRef} />

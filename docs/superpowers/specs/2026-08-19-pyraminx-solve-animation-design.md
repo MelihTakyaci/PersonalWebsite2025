@@ -182,12 +182,25 @@ Timing, all from `lib/motion.ts` where a token fits:
 | Phase | Duration |
 |---|---|
 | One move | 0.4 s (`duration.md`), eased with `ease.enter` |
-| Gap between moves | 0.08 s (no token fits; the scale's smallest is 0.16 s) |
-| Hold after scramble | 0.64 s (`duration.lg`) |
-| Hold on solved | 2.4 s |
+| Gap between moves | 0.02 s |
+| Hold after scramble | 0.16 s (`duration.xs`) |
+| Hold on solved | 0.9 s (`duration.xl`) |
 
-The slow idle rotation about `Y` and the pointer tilt continue underneath the
-whole cycle, driven by the existing local time accumulator.
+Holds are deliberately short. The cycle should read as one continuous working
+motion rather than turns punctuated by pauses: roughly 28 turns in 12.8 s, of
+which about 1 s is waiting.
+
+### Resting motion
+
+Underneath the cycle the model holds a composed pose rather than a flat spin: a
+constant yaw at `0.075 rad/s`, a resting tilt of `-0.22 rad` so it is seen
+slightly from above, and two slow oscillations at `0.19` and `0.13 rad/s` on `x`
+and `z` that keep tipping it so different faces move through the light. A
+constant yaw at a fixed elevation repeats the same silhouette forever.
+
+The pointer tilt is damped in its own accumulator and added on top. It cannot
+damp `rotation.x` directly any more, because that value now also carries the
+resting tilt and the oscillation.
 
 ---
 
