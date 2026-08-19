@@ -169,12 +169,17 @@ check('6. Birikme yok: 500 hamle + tersi = başlangıç', worstDrift <= EPS, `en
   const sweepMaterial = createSweepMaterial()
   const shader = { uniforms: {}, vertexShader: lib.vertexShader, fragmentShader: lib.fragmentShader }
   sweepMaterial.onBeforeCompile(shader)
+
+  // Asserted against the untouched shader rather than against literal lines of
+  // our own GLSL, so tuning the sweep does not make this check stale.
+  const emissiveWrites = (src) => src.split('totalEmissiveRadiance +=').length - 1
   const injected =
-    shader.vertexShader.includes('varying vec3 vSweepWorld;') &&
-    shader.vertexShader.includes('vSweepWorld = (modelMatrix') &&
+    shader.vertexShader.includes('vSweepWorld') &&
+    shader.vertexShader.includes('vSweepNormal') &&
+    shader.vertexShader.length > lib.vertexShader.length &&
     shader.fragmentShader.includes('uniform float uTime;') &&
-    shader.fragmentShader.includes('totalEmissiveRadiance += band') &&
-    'uTime' in shader.uniforms &&
+    emissiveWrites(shader.fragmentShader) === emissiveWrites(lib.fragmentShader) + 1 &&
+    Object.keys(sweepMaterial.sweep).every((name) => name in shader.uniforms) &&
     sweepMaterial.vertexColors === true
 
   check('7. Shader bağlantısı: enjeksiyon noktaları var ve uygulanıyor', anchorsOk && injected)

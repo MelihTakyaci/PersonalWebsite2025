@@ -59,10 +59,12 @@ export function scramble(length: number, random: () => number = Math.random): Mo
   let previous: Move | null = null
   while (moves.length < length) {
     const axis = AXIS_NAMES[Math.floor(random() * AXIS_NAMES.length)]
-    const layer: LayerName = random() < 0.3 ? 'tip' : 'axial'
-    // Never repeat the same axis and layer back to back: consecutive turns of
-    // one layer collapse into a single turn and read as a stutter.
-    if (previous && previous.axis === axis && previous.layer === layer) continue
+    const layer: LayerName = random() < 0.35 ? 'tip' : 'axial'
+    // Never turn the same axis twice in a row. Consecutive turns of one layer
+    // collapse into a single turn and read as a stutter, and spreading
+    // successive moves across corners is what makes the puzzle look like it is
+    // being worked from every side rather than fiddled with in one place.
+    if (previous && previous.axis === axis) continue
     const move: Move = { axis, layer, turns: random() < 0.5 ? 1 : -1 }
     moves.push(move)
     previous = move
@@ -106,7 +108,7 @@ const TIMING = {
   holdSolved: 2.4,
 } as const
 
-const SCRAMBLE_LENGTH = 8
+const SCRAMBLE_LENGTH = 14
 
 type Phase = 'scrambling' | 'holdScrambled' | 'solving' | 'holdSolved'
 

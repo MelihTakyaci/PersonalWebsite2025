@@ -167,8 +167,8 @@ transform composed from an exact 120° rotation, so the lattice never drifts.
 
 No solver. The cycle is:
 
-1. Generate a scramble of **8 moves**, avoiding a move that immediately undoes
-   its predecessor (same axis and layer, opposite direction).
+1. Generate a scramble of **14 moves**, never turning the same axis twice in a
+   row so successive turns land on different corners.
 2. Play the scramble.
 3. Hold briefly.
 4. Play the scramble **backwards with every turn inverted** — this is by
@@ -219,17 +219,31 @@ and, in the fragment stage, adds thin travelling bands to
 `totalEmissiveRadiance`:
 
 ```glsl
-float s = fract(vWorldPosition.y * uFrequency - uTime * uSpeed);
-float band = smoothstep(0.0, uSoftness, s)
-           * (1.0 - smoothstep(uWidth, uWidth + uSoftness, s));
-totalEmissiveRadiance += band * uIntensity * uColour;
+float phase  = fract(dot(vSweepWorld, uDirection) * uFrequency - uTime * uSpeed);
+float offset = min(phase, 1.0 - phase);
+float band   = exp(-(offset * offset) / (uWidth * uWidth));
+
+float facing  = clamp(dot(vSweepNormal, uDirection) * 0.5 + 0.5, 0.0, 1.0);
+float fresnel = pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 2.5);
+
+totalEmissiveRadiance += band * mix(0.3, 1.0, facing)
+                       * (0.25 + 0.75 * fresnel) * uIntensity * uColour;
 ```
 
-- Bands travel along `+Y`, across all four faces at once.
-- `uWidth` ≈ 0.02 of the repeat, `uSoftness` ≈ 0.01 — a crisp line, not a glow.
-- `uFrequency` gives roughly three bands over the model's height.
-- `uColour` is `#F5F5F7`; `uIntensity` low enough that a band reads as a
-  highlight rather than a light source.
+The band must behave like light, not like paint. A hard-edged bar that ignores
+the surface normal and the viewer reads as a stripe drawn on the model — this
+was built that way first and rejected on sight. Three things fix it:
+
+- **Gaussian profile** rather than `smoothstep` edges, so the band has no
+  boundary to catch the eye.
+- **`facing`** scales it by how much a face turns toward the travel direction,
+  which also widens the separation between the four faces.
+- **`fresnel`** brightens grazing angles, the way a real highlight rolls across
+  an edge.
+
+Defaults: bands travel along `+Y`, `uFrequency 0.6` (about three across the
+model), `uSpeed 1.6` — fast — `uWidth 0.09`, `uIntensity 0.55`, colour
+`#F5F5F7`.
 - `uTime` is advanced from the same local accumulator that drives the idle
   rotation, so it freezes with the rest under reduced motion.
 
