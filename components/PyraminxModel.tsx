@@ -13,7 +13,7 @@ useGLTF.preload('/black.glb')
 const BASE_SCALE = 0.5
 
 /** Radians per second of yaw. */
-const YAW_SPEED = 0.075
+const YAW_SPEED = 0.1
 /** Settled elevation, so the model is seen slightly from above. */
 const RESTING_TILT = -0.22
 /** How far the pointer can lean it, on top of the resting pose. */

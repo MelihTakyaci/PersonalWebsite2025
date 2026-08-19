@@ -102,12 +102,12 @@ const easeTurn = bezierEasing(ease.enter)
 // --- engine -----------------------------------------------------------------
 
 const TIMING = {
-  move: duration.md,
+  move: duration.sm,
   // Held deliberately short: the cycle should read as one continuous working
   // motion, not as a sequence of turns separated by pauses.
-  gap: 0.02,
+  gap: 0.01,
   holdScrambled: duration.xs,
-  holdSolved: duration.xl,
+  holdSolved: duration.lg,
 } as const
 
 const SCRAMBLE_LENGTH = 14

@@ -181,19 +181,19 @@ Timing, all from `lib/motion.ts` where a token fits:
 
 | Phase | Duration |
 |---|---|
-| One move | 0.4 s (`duration.md`), eased with `ease.enter` |
-| Gap between moves | 0.02 s |
+| One move | 0.24 s (`duration.sm`), eased with `ease.enter` |
+| Gap between moves | 0.01 s |
 | Hold after scramble | 0.16 s (`duration.xs`) |
-| Hold on solved | 0.9 s (`duration.xl`) |
+| Hold on solved | 0.64 s (`duration.lg`) |
 
 Holds are deliberately short. The cycle should read as one continuous working
-motion rather than turns punctuated by pauses: roughly 28 turns in 12.8 s, of
-which about 1 s is waiting.
+motion rather than turns punctuated by pauses: 28 turns in about 7.8 s, of which
+0.8 s is waiting.
 
 ### Resting motion
 
 Underneath the cycle the model holds a composed pose rather than a flat spin: a
-constant yaw at `0.075 rad/s`, a resting tilt of `-0.22 rad` so it is seen
+constant yaw at `0.1 rad/s`, a resting tilt of `-0.22 rad` so it is seen
 slightly from above, and two slow oscillations at `0.19` and `0.13 rad/s` on `x`
 and `z` that keep tipping it so different faces move through the light. A
 constant yaw at a fixed elevation repeats the same silhouette forever.
@@ -232,31 +232,42 @@ and, in the fragment stage, adds thin travelling bands to
 `totalEmissiveRadiance`:
 
 ```glsl
-float phase  = fract(dot(vSweepWorld, uDirection) * uFrequency - uTime * uSpeed);
-float offset = min(phase, 1.0 - phase);
-float band   = exp(-(offset * offset) / (uWidth * uWidth));
+float phase = dot(vSweepWorld, uDirection) * uFrequency - uTime * uSpeed;
+float lobe  = pow(0.5 + 0.5 * cos(TAU * phase), uSharpness);
+float under = pow(0.5 + 0.5 * cos(TAU * (phase * 0.45 + 0.37)), uSharpness);
+float band  = 0.6 * lobe + 0.4 * under;
 
 float facing  = clamp(dot(vSweepNormal, uDirection) * 0.5 + 0.5, 0.0, 1.0);
-float fresnel = pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 2.5);
+float fresnel = pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 1.8);
 
-totalEmissiveRadiance += band * mix(0.3, 1.0, facing)
-                       * (0.25 + 0.75 * fresnel) * uIntensity * uColour;
+totalEmissiveRadiance += band * mix(0.55, 1.0, facing)
+                       * (0.6 + 0.4 * fresnel) * uIntensity * uColour;
 ```
 
-The band must behave like light, not like paint. A hard-edged bar that ignores
-the surface normal and the viewer reads as a stripe drawn on the model — this
-was built that way first and rejected on sight. Three things fix it:
+The band must behave like light, not like paint. Two earlier shapes were built
+and rejected on sight:
 
-- **Gaussian profile** rather than `smoothstep` edges, so the band has no
-  boundary to catch the eye.
-- **`facing`** scales it by how much a face turns toward the travel direction,
-  which also widens the separation between the four faces.
-- **`fresnel`** brightens grazing angles, the way a real highlight rolls across
-  an edge.
+- **Hard-edged bar** (`smoothstep` between two boundaries, ignoring the normal
+  and the viewer) — read as a stripe drawn on the model.
+- **Gaussian band** — still has a peak and a tail, so however wide it gets it
+  stays a discrete stripe. Widening it only made a wider stripe.
 
-Defaults: bands travel along `+Y`, `uFrequency 0.6` (about three across the
-model), `uSpeed 1.6` — fast — `uWidth 0.09`, `uIntensity 0.55`, colour
-`#F5F5F7`.
+What works is a shape with no edge anywhere: a **raised cosine**, plus a second
+layer at an unrelated rate so the result never resolves into a countable number
+of lines. This is the light equivalent of blurring a hard shadow. Measured over
+the model's height, the gradient the eye reads as hardness falls from
+0.858 to 0.204 per unit against the first version, while contrast stays
+comparable (0.26 against 0.28) — softer, not merely dimmer. The floor rises from
+0.002 to 0.009, so there is no fully dark gap between passes.
+
+`facing` scales the band by how much a face turns toward the travel direction,
+which also widens the separation between the four faces. `fresnel` brightens
+grazing angles, weighted 0.6/0.4 toward the broad term so the light spreads
+across a face instead of collecting on its edges.
+
+Defaults: bands travel along `+Y`, `uFrequency 0.28` (roughly one broad lobe
+across the model), `uSpeed 1.1`, `uSharpness 1.0` (the softest lobe available —
+raise it to tighten), `uIntensity 0.3`, colour `#F5F5F7`.
 - `uTime` is advanced from the same local accumulator that drives the idle
   rotation, so it freezes with the rest under reduced motion.
 

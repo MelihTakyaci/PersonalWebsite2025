@@ -10,8 +10,9 @@ export interface SweepUniforms {
   uFrequency: { value: number }
   /** Cycles per second. */
   uSpeed: { value: number }
-  /** Gaussian half-width, in cycles. Larger is softer and more diffuse. */
-  uWidth: { value: number }
+  /** Lobe exponent. 1.0 is a pure raised cosine — the softest shape there is;
+   *  higher values pull the light into a tighter, harder band. */
+  uSharpness: { value: number }
   uIntensity: { value: number }
   uColour: { value: THREE.Color }
   /** Direction the bands travel, world space. */
@@ -23,11 +24,12 @@ export interface SweepMaterial extends THREE.MeshStandardMaterial {
 }
 
 /**
- * The bands are shaped like light rather than paint: a Gaussian profile instead
- * of a hard-edged bar, scaled by how much a face turns toward the travel
- * direction and by a Fresnel term so grazing angles catch them the way a real
- * highlight does. Without those two factors the sweep reads as a stripe drawn
- * on the surface, because it ignores both the geometry and the viewer.
+ * The bands are shaped like light rather than paint. Two raised-cosine layers
+ * at unrelated rates give a field with no edge and no countable stripes, and
+ * the result is scaled by how much a face turns toward the travel direction and
+ * by a Fresnel term so grazing angles catch it the way a real highlight does.
+ * Without those last two factors the sweep reads as something drawn on the
+ * surface, because it ignores both the geometry and the viewer.
  */
 export function createSweepMaterial(): SweepMaterial {
   const material = new THREE.MeshStandardMaterial({
@@ -38,10 +40,10 @@ export function createSweepMaterial(): SweepMaterial {
 
   const sweep: SweepUniforms = {
     uTime: { value: 0 },
-    uFrequency: { value: 0.4 },
-    uSpeed: { value: 1.35 },
-    uWidth: { value: 0.22 },
-    uIntensity: { value: 0.28 },
+    uFrequency: { value: 0.28 },
+    uSpeed: { value: 1.1 },
+    uSharpness: { value: 1.0 },
+    uIntensity: { value: 0.3 },
     uColour: { value: new THREE.Color(0xf5f5f7) },
     uDirection: { value: new THREE.Vector3(0, 1, 0) },
   }
@@ -71,7 +73,7 @@ varying vec3 vSweepNormal;
 uniform float uTime;
 uniform float uFrequency;
 uniform float uSpeed;
-uniform float uWidth;
+uniform float uSharpness;
 uniform float uIntensity;
 uniform vec3 uColour;
 uniform vec3 uDirection;`
@@ -82,9 +84,14 @@ uniform vec3 uDirection;`
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
 {
-  float phase = fract(dot(vSweepWorld, uDirection) * uFrequency - uTime * uSpeed);
-  float offset = min(phase, 1.0 - phase);
-  float band = exp(-(offset * offset) / (uWidth * uWidth));
+  // A Gaussian band still has a peak and a tail, so it reads as a discrete
+  // stripe however wide it gets. A raised cosine has no edge anywhere, and a
+  // second layer at an unrelated rate stops the result from ever resolving into
+  // a countable number of lines — the light equivalent of blurring a hard shadow.
+  float phase = dot(vSweepWorld, uDirection) * uFrequency - uTime * uSpeed;
+  float lobe  = pow(0.5 + 0.5 * cos(6.28318530718 * phase), uSharpness);
+  float under = pow(0.5 + 0.5 * cos(6.28318530718 * (phase * 0.45 + 0.37)), uSharpness);
+  float band  = 0.6 * lobe + 0.4 * under;
 
   float facing = clamp(dot(vSweepNormal, uDirection) * 0.5 + 0.5, 0.0, 1.0);
   float fresnel = pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 1.8);
