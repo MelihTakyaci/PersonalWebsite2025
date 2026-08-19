@@ -4,8 +4,9 @@ import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import PyraminxModel from './PyraminxModel'
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion'
+import type { MotionValue } from 'framer-motion'
 
-export default function PyraminxCanvas() {
+export default function PyraminxCanvas({ glitch }: { glitch?: MotionValue<number> }) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)
   const [inView, setInView] = useState(true)
@@ -44,7 +45,7 @@ export default function PyraminxCanvas() {
           <directionalLight position={[-5, 5, 10]} intensity={0.8} color="#ffffff" />
           <pointLight position={[5, 0, -5]} intensity={0.5} color="#888888" distance={20} decay={2} />
 
-          <PyraminxModel animate={!reduced} />
+          <PyraminxModel animate={!reduced} glitch={glitch} />
 
           <OrbitControls
             enableZoom={false}

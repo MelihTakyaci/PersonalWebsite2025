@@ -2,7 +2,7 @@
 
 import { useRef } from 'react'
 import dynamic from 'next/dynamic'
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import TextReveal from '@/components/motion/TextReveal'
 import { duration, ease } from '@/lib/motion'
 
@@ -26,16 +26,11 @@ export default function Hero() {
     target: ref,
     offset: ['start start', 'end start'],
   })
-  const progress = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 30,
-    mass: 0.6,
-  })
-
-  const scale = useTransform(progress, [0, 1], [1, 0.32])
-  const x = useTransform(progress, [0, 1], ['0%', '34%'])
-  const y = useTransform(progress, [0, 1], ['0%', '-30%'])
-  const sceneOpacity = useTransform(progress, [0, 0.9], [1, 0.45])
+  // The scene does not move. An earlier version mapped scroll to scale and
+  // position through a spring, which could not put the model back exactly where
+  // it started once the sticky container released. Nothing travels now, so
+  // there is no position to restore — it simply tears away and comes back.
+  const glitch = useTransform(scrollYProgress, [0, 0.35], [0, 1])
 
   return (
     <section
@@ -46,13 +41,12 @@ export default function Hero() {
     >
       <div className="sticky top-0 h-screen overflow-hidden">
         {/* Scene */}
-        <motion.div
+        <div
           aria-hidden="true"
-          style={{ scale, x, y, opacity: sceneOpacity }}
           className="absolute inset-x-0 top-[14vh] mx-auto h-[52vh] w-full max-w-[560px]"
         >
-          <PyraminxCanvas />
-        </motion.div>
+          <PyraminxCanvas glitch={glitch} />
+        </div>
 
         {/* Type */}
         <div className="absolute inset-x-0 bottom-0 px-6 pb-[12vh] sm:px-10">

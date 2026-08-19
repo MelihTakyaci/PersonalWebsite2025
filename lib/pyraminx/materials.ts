@@ -1,11 +1,12 @@
-// lib/pyraminx/sweepMaterial.ts
-// One material for the whole puzzle: the face luminance ramp rides in vertex
-// colours (which is what lets each piece merge to a single geometry), and soft
-// bands of light travel across the surfaces in world space.
+// lib/pyraminx/materials.ts
+// The puzzle's two materials and the uniform set they share: a surface material
+// carrying the luminance ramp and the light sweep, and a line material for the
+// edge overlay. Both take the same signal-tear injection, and both read one
+// clock, so a single update per frame drives everything.
 import * as THREE from 'three'
+import { createGlitchUniforms, injectGlitch, type GlitchUniforms } from './glitch.ts'
 
 export interface SweepUniforms {
-  uTime: { value: number }
   /** Bands per world unit along the travel direction. */
   uFrequency: { value: number }
   /** Cycles per second. */
@@ -21,27 +22,25 @@ export interface SweepUniforms {
   uDirection: { value: THREE.Vector3 }
 }
 
-export interface SweepMaterial extends THREE.MeshStandardMaterial {
-  sweep: SweepUniforms
+export type PuzzleUniforms = GlitchUniforms & SweepUniforms
+
+export interface PuzzleMaterials {
+  surface: THREE.MeshStandardMaterial
+  edge: THREE.LineBasicMaterial
+  uniforms: PuzzleUniforms
 }
 
 /**
- * The bands are shaped like light rather than paint. Two raised-cosine layers
- * at unrelated rates give a field with no edge and no countable stripes, and
- * the result is scaled by how much a face turns toward the travel direction and
- * by a Fresnel term so grazing angles catch it the way a real highlight does.
- * Without those last two factors the sweep reads as something drawn on the
- * surface, because it ignores both the geometry and the viewer.
+ * The sweep behaves like light rather than paint. Two raised-cosine layers at
+ * unrelated rates give a field with no edge and no countable stripes; the
+ * result is scaled by how much a face turns toward the travel direction, by a
+ * Fresnel term so grazing angles catch it, and finally by the surface's own
+ * colour — a flat white emissive on a near-black material peaks well above the
+ * albedo and washes every face out.
  */
-export function createSweepMaterial(): SweepMaterial {
-  const material = new THREE.MeshStandardMaterial({
-    vertexColors: true,
-    metalness: 0.3,
-    roughness: 0.4,
-  }) as SweepMaterial
-
-  const sweep: SweepUniforms = {
-    uTime: { value: 0 },
+export function createPuzzleMaterials(): PuzzleMaterials {
+  const uniforms: PuzzleUniforms = {
+    ...createGlitchUniforms(),
     uFrequency: { value: 0.28 },
     uSpeed: { value: 1.1 },
     uSharpness: { value: 1.0 },
@@ -49,10 +48,16 @@ export function createSweepMaterial(): SweepMaterial {
     uColour: { value: new THREE.Color(0xf5f5f7) },
     uDirection: { value: new THREE.Vector3(0, 1, 0) },
   }
-  material.sweep = sweep
 
-  material.onBeforeCompile = (shader) => {
-    Object.assign(shader.uniforms, sweep)
+  const surface = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    metalness: 0.3,
+    roughness: 0.4,
+  })
+
+  surface.onBeforeCompile = (shader) => {
+    // injectGlitch binds the whole uniform set, sweep values included.
+    injectGlitch(shader, uniforms)
 
     shader.vertexShader = shader.vertexShader
       .replace(
@@ -72,7 +77,6 @@ vSweepNormal = normalize(mat3(modelMatrix) * objectNormal);`
         `#include <common>
 varying vec3 vSweepWorld;
 varying vec3 vSweepNormal;
-uniform float uTime;
 uniform float uFrequency;
 uniform float uSpeed;
 uniform float uSharpness;
@@ -86,10 +90,6 @@ uniform vec3 uDirection;`
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
 {
-  // A Gaussian band still has a peak and a tail, so it reads as a discrete
-  // stripe however wide it gets. A raised cosine has no edge anywhere, and a
-  // second layer at an unrelated rate stops the result from ever resolving into
-  // a countable number of lines — the light equivalent of blurring a hard shadow.
   float phase = dot(vSweepWorld, uDirection) * uFrequency - uTime * uSpeed;
   float lobe  = pow(0.5 + 0.5 * cos(6.28318530718 * phase), uSharpness);
   float under = pow(0.5 + 0.5 * cos(6.28318530718 * (phase * 0.45 + 0.37)), uSharpness);
@@ -98,28 +98,31 @@ uniform vec3 uDirection;`
   float facing = clamp(dot(vSweepNormal, uDirection) * 0.5 + 0.5, 0.0, 1.0);
   float fresnel = pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 1.8);
 
-  // Weighted toward the broad term rather than the rim, so the band spreads
-  // across a face instead of collecting on its edges.
   float light = band * mix(0.55, 1.0, facing) * (0.6 + 0.4 * fresnel);
 
   // Reflect off the surface rather than replacing it. Adding a flat white
-  // emissive to a near-black material swamps it: at the previous setting the
+  // emissive to a near-black material swamps it: at an absolute setting the
   // band peaked at 2.2x the brightest face's albedo and 13x the darkest, which
-  // is what washed every face out and flattened the luminance ramp along with
-  // it. Scaling by diffuseColor makes each face lift in proportion to what it
-  // already is, the way a real highlight does. The small floor keeps the
-  // darkest face from dropping out of the sweep entirely.
+  // washed every face out and flattened the luminance ramp along with it.
+  // Scaling by diffuseColor makes each face lift in proportion to what it
+  // already is, the way a real highlight does.
   vec3 reflected = diffuseColor.rgb + vec3(0.004);
   totalEmissiveRadiance += light * uIntensity * uColour * reflected;
+
+  // Colour fringe, strongest halfway through the tear and gone at both ends.
+  float fringeAmount = uGlitch * (1.0 - uGlitch) * 4.0 * uJitter;
+  vec3 fringe = vec3(
+    glitchHash(vGlitchSlice * 3.1),
+    glitchHash(vGlitchSlice * 5.7),
+    glitchHash(vGlitchSlice * 9.3)
+  );
+  totalEmissiveRadiance += fringe * fringeAmount * 1.6 * reflected;
 }`
       )
   }
 
-  return material
-}
+  const edge = new THREE.LineBasicMaterial({ color: 0x9aa0a8, opacity: 0.75, transparent: true })
+  edge.onBeforeCompile = (shader) => injectGlitch(shader, uniforms)
 
-/** Edge overlay, kept from the previous look: the body stays near black, so the
- *  wireframe is what gives the object its silhouette against the dark ground. */
-export function createEdgeMaterial(): THREE.LineBasicMaterial {
-  return new THREE.LineBasicMaterial({ color: 0x9aa0a8, opacity: 0.75, transparent: true })
+  return { surface, edge, uniforms }
 }

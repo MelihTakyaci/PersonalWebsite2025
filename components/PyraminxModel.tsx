@@ -6,7 +6,8 @@ import { useGLTF } from '@react-three/drei'
 import { EdgesGeometry, Group, LineSegments } from 'three'
 import { buildPuzzle, type Puzzle } from '@/lib/pyraminx/pieces'
 import { PyraminxEngine } from '@/lib/pyraminx/moves'
-import { createEdgeMaterial, createSweepMaterial } from '@/lib/pyraminx/sweepMaterial'
+import { createPuzzleMaterials } from '@/lib/pyraminx/materials'
+import type { MotionValue } from 'framer-motion'
 
 useGLTF.preload('/black.glb')
 
@@ -23,7 +24,13 @@ const POINTER_TILT = 0.1
 // PYRAMINX — 14 pieces that scramble and solve on a loop
 // ============================================================================
 
-export default function PyraminxModel({ animate }: { animate: boolean }) {
+type Props = {
+  animate: boolean
+  /** 0 = fully present, 1 = torn away. Driven by hero scroll progress. */
+  glitch?: MotionValue<number>
+}
+
+export default function PyraminxModel({ animate, glitch }: Props) {
   const groupRef = useRef<Group>(null!)
   const puzzleRef = useRef<Puzzle | null>(null)
   const engineRef = useRef<PyraminxEngine | null>(null)
@@ -37,15 +44,16 @@ export default function PyraminxModel({ animate }: { animate: boolean }) {
   const pointerTilt = useRef(0)
 
   const { scene } = useGLTF('/black.glb')
-  const material = useMemo(() => createSweepMaterial(), [])
-  const edgeMaterial = useMemo(() => createEdgeMaterial(), [])
+  const materials = useMemo(() => createPuzzleMaterials(), [])
 
   useEffect(() => {
     if (!scene || !groupRef.current) return
 
-    const puzzle = buildPuzzle(scene, material)
+    const puzzle = buildPuzzle(scene, materials.surface)
     for (const piece of puzzle.pieces) {
-      piece.object.add(new LineSegments(new EdgesGeometry(piece.object.geometry, 15), edgeMaterial))
+      piece.object.add(
+        new LineSegments(new EdgesGeometry(piece.object.geometry, 15), materials.edge)
+      )
     }
 
     groupRef.current.add(puzzle.root)
@@ -61,7 +69,7 @@ export default function PyraminxModel({ animate }: { animate: boolean }) {
       puzzleRef.current = null
       engineRef.current = null
     }
-  }, [scene, material, edgeMaterial])
+  }, [scene, materials])
 
   // Reduced motion: drop straight back to the solved pose and hold it.
   useEffect(() => {
@@ -82,9 +90,14 @@ export default function PyraminxModel({ animate }: { animate: boolean }) {
     const eased = 1 - Math.pow(1 - intro, 3)
     group.scale.setScalar(BASE_SCALE * (0.85 + 0.15 * eased))
 
+    // Set even when motion is reduced: the scene still has to clear out of the
+    // way as the page scrolls, it just does so without the tear or the fringe.
+    materials.uniforms.uGlitch.value = glitch ? glitch.get() : 0
+    materials.uniforms.uJitter.value = animate ? 1 : 0
+
     if (!animate) return
 
-    material.sweep.uTime.value = t
+    materials.uniforms.uTime.value = t
     engineRef.current?.update(step)
 
     // Pose. A constant yaw at a fixed elevation shows the same silhouette

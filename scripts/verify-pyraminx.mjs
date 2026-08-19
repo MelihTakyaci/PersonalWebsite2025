@@ -11,7 +11,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { buildPuzzle, currentCentroid } from '../lib/pyraminx/pieces.ts'
 import { AXES, AXIS_NAMES, applyMove, layerMembers, scramble, solutionFor } from '../lib/pyraminx/moves.ts'
-import { createSweepMaterial } from '../lib/pyraminx/sweepMaterial.ts'
+import { createPuzzleMaterials } from '../lib/pyraminx/materials.ts'
 
 const EPS = 1e-6
 const failures = []
@@ -154,35 +154,60 @@ puzzle.pieces.forEach((piece, i) => {
 check('6. Birikme yok: 500 hamle + tersi = başlangıç', worstDrift <= EPS, `en kötü sapma ${worstDrift.toExponential(2)}`)
 
 // 7 — shader wiring. onBeforeCompile edits three's source by string match, so a
-//     renamed chunk would silently no-op and the sweep would simply never
-//     appear. Assert every anchor exists exactly once and every injection lands.
+//     renamed chunk would silently no-op: the sweep would never appear, or the
+//     model would refuse to glitch away and sit on top of the page content.
 {
-  const lib = THREE.ShaderLib.physical
-  const anchors = [
-    ['vertex', lib.vertexShader, '#include <common>'],
-    ['vertex', lib.vertexShader, '#include <begin_vertex>'],
-    ['fragment', lib.fragmentShader, '#include <common>'],
-    ['fragment', lib.fragmentShader, '#include <emissivemap_fragment>'],
-  ]
-  const anchorsOk = anchors.every(([, src, needle]) => src.split(needle).length - 1 === 1)
-
-  const sweepMaterial = createSweepMaterial()
-  const shader = { uniforms: {}, vertexShader: lib.vertexShader, fragmentShader: lib.fragmentShader }
-  sweepMaterial.onBeforeCompile(shader)
-
-  // Asserted against the untouched shader rather than against literal lines of
-  // our own GLSL, so tuning the sweep does not make this check stale.
+  const compile = (lib, material) => {
+    const shader = {
+      uniforms: {},
+      vertexShader: lib.vertexShader,
+      fragmentShader: lib.fragmentShader,
+    }
+    material.onBeforeCompile(shader, {})
+    return shader
+  }
   const emissiveWrites = (src) => src.split('totalEmissiveRadiance +=').length - 1
-  const injected =
-    shader.vertexShader.includes('vSweepWorld') &&
-    shader.vertexShader.includes('vSweepNormal') &&
-    shader.vertexShader.length > lib.vertexShader.length &&
-    shader.fragmentShader.includes('uniform float uTime;') &&
-    emissiveWrites(shader.fragmentShader) === emissiveWrites(lib.fragmentShader) + 1 &&
-    Object.keys(sweepMaterial.sweep).every((name) => name in shader.uniforms) &&
-    sweepMaterial.vertexColors === true
+  const discards = (src) => src.split('discard;').length - 1
 
-  check('7. Shader bağlantısı: enjeksiyon noktaları var ve uygulanıyor', anchorsOk && injected)
+  const { surface, edge, uniforms } = createPuzzleMaterials()
+
+  const physical = THREE.ShaderLib.physical
+  const basic = THREE.ShaderLib.basic
+
+  // Anchors every injection depends on, in both shader families.
+  const anchors = [
+    [physical.vertexShader, '#include <common>'],
+    [physical.vertexShader, '#include <begin_vertex>'],
+    [physical.vertexShader, '#include <project_vertex>'],
+    [physical.fragmentShader, '#include <common>'],
+    [physical.fragmentShader, '#include <clipping_planes_fragment>'],
+    [physical.fragmentShader, '#include <emissivemap_fragment>'],
+    [basic.vertexShader, '#include <common>'],
+    [basic.vertexShader, '#include <project_vertex>'],
+    [basic.fragmentShader, '#include <common>'],
+    [basic.fragmentShader, '#include <clipping_planes_fragment>'],
+  ]
+  const anchorsOk = anchors.every(([src, needle]) => src.split(needle).length - 1 === 1)
+
+  const surfaceShader = compile(physical, surface)
+  const edgeShader = compile(basic, edge)
+
+  const surfaceOk =
+    surfaceShader.vertexShader.includes('vSweepWorld') &&
+    surfaceShader.vertexShader.includes('vGlitchSlice') &&
+    emissiveWrites(surfaceShader.fragmentShader) === emissiveWrites(physical.fragmentShader) + 2 &&
+    discards(surfaceShader.fragmentShader) === discards(physical.fragmentShader) + 1 &&
+    Object.keys(uniforms).every((name) => name in surfaceShader.uniforms) &&
+    surface.vertexColors === true
+
+  // The edge overlay must tear away with the body; if it does not, the
+  // wireframe is left hanging in the air after the surface has gone.
+  const edgeOk =
+    edgeShader.vertexShader.includes('vGlitchSlice') &&
+    discards(edgeShader.fragmentShader) === discards(basic.fragmentShader) + 1 &&
+    'uGlitch' in edgeShader.uniforms
+
+  check('7. Shader bağlantısı: süpürme ve glitch iki materyale de uygulanıyor', anchorsOk && surfaceOk && edgeOk)
 }
 
 // Informational: the asset's pieces are not congruent, so a scrambled pose

@@ -290,6 +290,39 @@ exactly one shader program and one `uTime` uniform to update per frame.
 
 ---
 
+## 7b. Scroll transition
+
+The hero originally mapped scroll progress to the scene's scale and position
+through a spring, parking the model in a corner. It could not return the model
+to exactly where it started once the sticky container released, and the drift
+was visible.
+
+The scene no longer moves at all. Scroll progress drives a single `uGlitch`
+value from 0 to 1 across the first 35% of the hero, and the model tears away in
+place; scrolling back plays it in reverse. There is no position to restore
+because nothing travels. The mapping is a plain `useTransform`, not a spring, so
+the reversal is exact.
+
+Three layers, shared by both materials so the wireframe comes apart with the
+body rather than hanging in the air after it:
+
+1. **Tear** — in the vertex stage, applied in *view* space after
+   `<project_vertex>` so the bands stay horizontal on screen while the model
+   turns underneath them. Screen Y is quantised into slices; each takes a
+   random lateral offset reseeded 18 times a second.
+2. **Dissolve** — in the fragment stage, whole slices `discard` once their hash
+   falls below `uGlitch`. A different hash from the tear, so the slices that
+   shift are not the ones that vanish.
+3. **Colour fringe** — a per-slice RGB tint, strongest halfway through and gone
+   at both ends. Multiplied by `diffuseColor` like the sweep, so it cannot wash
+   the surface out.
+
+Under `prefers-reduced-motion: reduce`, `uJitter` goes to 0: no tear and no
+fringe, leaving a plain dissolve. The scene still has to clear out of the way as
+the page scrolls; it just does so without shaking.
+
+---
+
 ## 8. Integration and performance
 
 `black.glb` has 51 meshes against `blackO.glb`'s 5, and every mesh currently
