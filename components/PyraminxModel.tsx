@@ -56,29 +56,30 @@ export default function PyraminxModel({ animate }: { animate: boolean }) {
       }
     })
 
-    // The GLB's meshes sit ~1.05 units off the origin in Z (and 0.75 in Y),
-    // so rotation.y swings the model around a circle of that radius instead of
-    // spinning it in place — it drifts sideways and only returns to its
-    // starting pose after a full revolution (~78s). Re-centre the children on
-    // the assembled bounds so the pivot is the model's own centre.
-    //
-    // Measured in the group's local space (geometry bounds x local matrix)
-    // rather than with Box3.setFromObject, because useFrame may already have
-    // applied a scale and rotation to the group by the time this runs.
-    const bounds = new THREE.Box3()
-    const meshBounds = new THREE.Box3()
+    // Centre the assembled group on its true centroid so rotation.y spins it
+    // in place. This must be the *vertex* centroid, not the bounding-box
+    // centre: a tetrahedron's bbox centre sits well off its centroid (1.05 in
+    // one axis, 0.75 in another for this model), and pivoting there swings the
+    // model through an arc of that radius. As shipped the GLB is already
+    // centred to within 0.005 units, so this is normally a no-op — it is here
+    // to stay correct if the asset is ever re-exported off-centre.
+    const centroid = new THREE.Vector3()
+    const vertex = new THREE.Vector3()
+    let vertexCount = 0
     for (const child of groupRef.current.children) {
       const mesh = child as Mesh
-      if (!mesh.geometry) continue
-      mesh.geometry.computeBoundingBox()
-      if (!mesh.geometry.boundingBox) continue
+      const position = mesh.geometry?.attributes.position
+      if (!position) continue
       mesh.updateMatrix()
-      meshBounds.copy(mesh.geometry.boundingBox).applyMatrix4(mesh.matrix)
-      bounds.union(meshBounds)
+      for (let i = 0; i < position.count; i++) {
+        vertex.fromBufferAttribute(position, i).applyMatrix4(mesh.matrix)
+        centroid.add(vertex)
+        vertexCount++
+      }
     }
-    if (!bounds.isEmpty()) {
-      const centre = bounds.getCenter(new THREE.Vector3())
-      for (const child of groupRef.current.children) child.position.sub(centre)
+    if (vertexCount > 0) {
+      centroid.divideScalar(vertexCount)
+      for (const child of groupRef.current.children) child.position.sub(centroid)
     }
   }, [scene])
 
