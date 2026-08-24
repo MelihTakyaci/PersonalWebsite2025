@@ -47,7 +47,8 @@ export default function PyraminxModel({ animate, glitch }: Props) {
   const materials = useMemo(() => createPuzzleMaterials(), [])
 
   useEffect(() => {
-    if (!scene || !groupRef.current) return
+    const group = groupRef.current
+    if (!scene || !group) return
 
     const puzzle = buildPuzzle(scene, materials.surface)
     for (const piece of puzzle.pieces) {
@@ -56,12 +57,12 @@ export default function PyraminxModel({ animate, glitch }: Props) {
       )
     }
 
-    groupRef.current.add(puzzle.root)
+    group.add(puzzle.root)
     puzzleRef.current = puzzle
     engineRef.current = new PyraminxEngine(puzzle)
 
     return () => {
-      groupRef.current?.remove(puzzle.root)
+      group.remove(puzzle.root)
       puzzle.root.traverse((object) => {
         const withGeometry = object as { geometry?: { dispose(): void } }
         withGeometry.geometry?.dispose()

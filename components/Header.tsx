@@ -46,6 +46,10 @@ export default function Header() {
     >
       <motion.nav
         aria-label="Main navigation"
+        // Explicit start values: the className sets neither, so framer-motion
+        // would otherwise read `max-width: none` off the computed style and
+        // refuse to animate it, leaving the condense transition to jump.
+        initial={{ maxWidth: 1280, paddingLeft: 16, paddingRight: 16 }}
         animate={{
           maxWidth: condensed ? 560 : 1280,
           paddingLeft: condensed ? 20 : 16,

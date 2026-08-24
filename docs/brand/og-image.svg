@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="glow" cx="0.5" cy="-0.1" r="0.72">
+      <stop offset="0" stop-color="#5B8CFF" stop-opacity="0.14"/>
+      <stop offset="0.62" stop-color="#5B8CFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="vignette" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0.5" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.55"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="#08090A"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect width="1200" height="630" fill="url(#vignette)"/>
+
+  <g transform="translate(80,68) scale(0.1171875)">
+    <path d="M256 112 L430 414 L82 414 Z" fill="#F5F5F7"/>
+    <g stroke="#08090A" stroke-width="26" stroke-linecap="round">
+      <path d="M256 112 V313"/>
+      <path d="M82 414 L256 313"/>
+      <path d="M430 414 L256 313"/>
+    </g>
+  </g>
+
+  <text x="80" y="316" font-family="SF Pro Display, Helvetica Neue, Helvetica, sans-serif"
+        font-size="92" font-weight="600" letter-spacing="-3.2" fill="#F5F5F7">Melih Takyaci</text>
+
+  <text x="80" y="382" font-family="SF Pro Display, Helvetica Neue, Helvetica, sans-serif"
+        font-size="34" font-weight="400" letter-spacing="-0.34" fill="#A1A1A6">Full-stack engineer building systems</text>
+  <text x="80" y="430" font-family="SF Pro Display, Helvetica Neue, Helvetica, sans-serif"
+        font-size="34" font-weight="400" letter-spacing="-0.34" fill="#A1A1A6">from silicon to screen.</text>
+
+  <line x1="80" y1="500" x2="700" y2="500" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="1"/>
+
+  <text x="80" y="542" font-family="SF Mono, Menlo, monospace"
+        font-size="19" letter-spacing="2.7" fill="#6E6E73">NEXT.JS · TYPESCRIPT · STM32 · OPENCV · DOCKER</text>
+</svg>

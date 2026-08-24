@@ -96,14 +96,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* JSON-LD: Person + WebSite (AI’ların entity çözümlemesi için) */}
         <script
           type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Person",
               "name": "Melih Takyacı",
               "url": siteUrl,
-              "image": `${siteUrl}/profile.jpg`,
+              "image": `${siteUrl}/default.png`,
               "jobTitle": "Full-Stack Developer & AI/Embedded Enthusiast",
               "worksFor": { "@type": "Organization", "name": "Acem Solutions" },
               "sameAs": [

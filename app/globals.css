@@ -64,6 +64,11 @@
 
 @layer base {
   html {
+    /* useScroll's default container is the root element, and it measures
+       target offsets against it — framer-motion warns when that container is
+       static. Relative does not create a containing block for the fixed
+       header, so this only affects the measurement. */
+    position: relative;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -100,5 +105,19 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* The capabilities rail buys its extra height purely to drive the
+     scroll-linked focus. With motion off there is nothing to step through, so
+     release the pin instead of leaving three empty screens to scroll past.
+     Done in CSS, not JS: branching the layout on a hook would settle only
+     after hydration and shift the page under the reader. */
+  [data-rail] {
+    min-height: 0 !important;
+  }
+
+  [data-rail] > * {
+    position: static !important;
+    height: auto !important;
   }
 }
