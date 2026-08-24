@@ -6,6 +6,7 @@ import {
   ExperienceCards,
   ContactSection,
   GitHubCTA,
+  ScholarLink,
 } from '@/components'
 import SectionHeader from '@/components/SectionHeader'
 import BackgroundFX from '@/components/BackgroundFX'
@@ -15,11 +16,13 @@ export default function Home() {
     <main className="relative min-h-screen">
       <BackgroundFX />
       <Header />
+      <ScholarLink />
       <Hero />
 
       <div className="mx-auto max-w-6xl px-6 sm:px-10">
+        {/* This section's heading is rendered by Carousel, inside the pinned
+            rail — see the note there. */}
         <section id="projects" aria-labelledby="skills-title" className="pt-28 sm:pt-40">
-          <SectionHeader index="01" label="Capabilities" title="What I work on" id="skills-title" />
           <Carousel />
         </section>
 
