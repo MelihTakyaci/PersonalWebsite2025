@@ -10,8 +10,6 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  // Frozen snapshot of the previous site — kept for reference, never built.
-  { ignores: ["old/**"] },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
 ];
 

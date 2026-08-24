@@ -1,0 +1,21 @@
+# public/robots.txt
+User-agent: *
+Allow: /
+
+# AI/LLM ekosistemi
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://melihtakyaci.com/sitemap.xml
