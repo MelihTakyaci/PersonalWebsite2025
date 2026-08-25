@@ -9,12 +9,12 @@ import {
   ExperienceCards,
   ContactSection,
   GitHubCTA,
-} from '@/components'
+} from '@/components/old'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Typewriter } from 'react-simple-typewriter'
-import BackgroundFX from '@/components/BackgroundFX'
+import BackgroundFX from '@/components/old/BackgroundFX'
 
-const PyraminxCanvas = dynamic(() => import('@/components/PyraminxCanvas'), {
+const PyraminxCanvas = dynamic(() => import('@/components/old/PyraminxCanvas'), {
   ssr: false,
   loading: () => null,
 })

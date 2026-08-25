@@ -8,28 +8,28 @@ const projects = [
     role: 'Full-Stack Developer',
     period: '2025',
     gradient: 'from-purple-500 via-indigo-500 to-blue-500',
-    image: '/Experience/Mobile.PNG',
+    image: '/old/Experience/Mobile.PNG',
   },
   {
     title: 'E-commerce platform with CMS 🌍',
     role: 'Full Stack Developer',
     period: '2024',
     gradient: 'from-green-400 via-lime-400 to-yellow-300',
-    image: '/Experience/ecommerce.png',
+    image: '/old/Experience/ecommerce.png',
   },
   {
     title: 'Marketing Website',
     role: 'UI Developer',
     period: '2025',
     gradient: 'from-sky-500 via-cyan-400 to-emerald-400',
-    image: '/Experience/Destani.png',
+    image: '/old/Experience/Destani.png',
   },
   {
     title: 'NGO Website',
     role: 'Full Stack Developer',
     period: '2024',
     gradient: 'from-pink-400 via-red-400 to-orange-300',
-    image: '/Experience/KotgepWeb.png',
+    image: '/old/Experience/KotgepWeb.png',
   },
 ];
 

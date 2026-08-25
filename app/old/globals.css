@@ -1,4 +1,8 @@
-@import "tailwindcss";
+/* Archived stylesheet for the previous site, served under /old.
+   The `@import "tailwindcss"` that opened this file is deliberately gone: the
+   root stylesheet already pulls Tailwind in, and v4 scans this route's sources
+   for classes, so importing it again would emit the whole utility set twice.
+   Everything below is kept as it shipped. */
 
 @keyframes shine {
   0% {

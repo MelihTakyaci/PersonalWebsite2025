@@ -27,14 +27,14 @@ export default function ContactSection() {
         >
           {/* Base Image */}
           <Image
-            src="/default.png"
+            src="/old/default.png"
             height={500} width={500}
             alt="Default Memoji"
             className={`rounded-full object-contain transition-opacity duration-500 w-20 ${hovered ? 'opacity-0' : 'opacity-100'}`}
           />
           {/* Hover Image */}
           <Image
-            src="/dyes.png"
+            src="/old/dyes.png"
             height={500} width={500}
             alt="Hover Memoji"
             className={`rounded-full object-contain transition-opacity duration-500 absolute top-0 left-0 w-30 ${hovered ? 'opacity-100' : 'opacity-0'}`}
