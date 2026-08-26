@@ -7,6 +7,7 @@ import {
   ContactSection,
   GitHubCTA,
   ScholarLink,
+  Publications,
 } from '@/components'
 import SectionHeader from '@/components/SectionHeader'
 import BackgroundFX from '@/components/BackgroundFX'
@@ -26,8 +27,13 @@ export default function Home() {
           <Carousel />
         </section>
 
+        <section id="research" aria-labelledby="research-title" className="pt-28 sm:pt-40">
+          <SectionHeader index="02" label="Research" title="Published work" id="research-title" />
+          <Publications />
+        </section>
+
         <section id="experience" aria-labelledby="experience-title" className="pt-28 sm:pt-40">
-          <SectionHeader index="02" label="Experience" title="Selected work" id="experience-title" />
+          <SectionHeader index="03" label="Experience" title="Selected work" id="experience-title" />
           <ExperienceCards />
         </section>
 
@@ -37,7 +43,7 @@ export default function Home() {
         </section>
 
         <section id="contact" aria-labelledby="contact-title" className="pt-28 sm:pt-40 pb-32">
-          <SectionHeader index="03" label="Contact" title="Get in touch" id="contact-title" />
+          <SectionHeader index="04" label="Contact" title="Get in touch" id="contact-title" />
           <ContactSection />
         </section>
       </div>

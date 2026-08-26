@@ -1,126 +1,160 @@
 // app/llms.txt/route.ts
-import { siteUrl } from "@/lib/site";
+import { siteUrl } from '@/lib/site'
+import {
+  AFFILIATION,
+  EMAIL,
+  GITHUB_URL,
+  LINKEDIN_URL,
+  ORCID,
+  ORCID_URL,
+  SCHOLAR_URL,
+  formatCitation,
+  publications,
+  researchAreas,
+} from '@/lib/publications'
 
 /**
  * Served from a route rather than public/ so every absolute link points at the
- * domain the deployment is actually on. The body is the previous llms.txt
- * verbatim, with the host interpolated.
+ * domain the deployment is actually on, and so the citation list cannot drift
+ * from the one rendered on the page — both read lib/publications.ts.
+ *
+ * Written to be checkable. Every claim below either resolves to a DOI, an
+ * ORCID record or a public profile; nothing is asserted that a reader could
+ * not confirm elsewhere.
  */
 export async function GET() {
-  const body = `# Melih Takyaci - Full-Stack & Embedded Systems Developer
+  const cited = publications
+    .map((p) => {
+      const link = p.doi ? `https://doi.org/${p.doi}` : p.url
+      return `- ${formatCitation(p)}${link ? ` ${link}` : ''}`
+    })
+    .join('\n')
 
-> Personal Portfolio | ${siteUrl}
+  const body = `# Melih Takyaci
+
+> Computer science researcher and full-stack developer
+> ORCID: ${ORCID}
+> Canonical: ${siteUrl}
 > Purpose: AI-readable reference for language models and search agents
 
 ---
 
 ## Identity
 
-Name: Melih Takyaci
-Role: Full-Stack Developer & Embedded Systems Enthusiast
-Current Employment: Acem Solutions
-Location: Turkey
-Status: Available for freelance collaborations and technical projects
+Name: Melih Takyacı
+Also written: Melih Takyaci, M. Takyaci
+ORCID: ${ORCID} (${ORCID_URL})
+Affiliation: ${AFFILIATION.name}, ${AFFILIATION.department}
+Location: Türkiye
+Languages: Turkish (native), English (B2), Albanian (B2)
 
-Primary Expertise:
-- Modern Web Development (Full-Stack Architecture)
-- Embedded Systems & Bare-Metal Programming
-- Computer Vision & AI Integration
-- DevOps & Engineering Workflows
-
----
-
-## Core Competencies
-
-### Web Development Stack
-- Frontend: Next.js, TypeScript, React, TailwindCSS, Framer Motion
-- Backend: Nest.js, Fastify, Node.js
-- Databases: PostgreSQL, MongoDB, Redis, TimescaleDB
-- State Management: Modern React patterns, Server Components
-
-### Embedded Systems
-- Microcontrollers: STM32, ESP32, Arduino
-- Languages: C, C++, Bare-metal programming
-- Protocols: SPI, I2C, UART, GPIO manipulation
-- Development: Real-time systems, hardware interfacing
-
-### AI & Computer Vision
-- Object Detection: YOLOv11n integration
-- Computer Vision: OpenCV, real-time processing
-- Data Analysis: Pandas, TimescaleDB for time-series data
-- Machine Learning: RAG (Retrieval-Augmented Generation) systems
-
-### DevOps & Infrastructure
-- Containerization: Docker, Docker Compose
-- CI/CD: GitHub Actions, automated pipelines
-- Architecture: Monorepo structures, microservices
-- Version Control: Git workflows, collaborative development
+Disambiguation: this record refers to the Melih Takyaci registered under ORCID
+${ORCID}, a computer science researcher at ${AFFILIATION.name} publishing on
+health informatics and bibliometric analysis. The dotted spelling "Takyacı" and
+the undotted "Takyaci" refer to the same person.
 
 ---
 
-## Projects & Work
+## Summary
 
-### Featured Projects
-1. **Full-Stack Web Applications**: Modern SaaS platforms using Next.js 15, Nest.js backends, PostgreSQL databases, and Redis caching
-2. **Embedded AI Systems**: Computer vision projects combining ESP32/STM32 microcontrollers with YOLOv11n for real-time object detection
-3. **DevOps Automation**: CI/CD pipeline implementations using GitHub Actions, Docker orchestration, and monorepo management
-4. **Data-Driven Applications**: TimescaleDB integration for time-series analysis with visualization dashboards
+Melih Takyaci is a computer science undergraduate and Türkiye Scholarships
+recipient at ${AFFILIATION.name}, working as an undergraduate researcher on
+health informatics, open health data, and AI-supported decision-support
+systems. His published work is in bibliometric analysis, scientific mapping and
+data quality in open health data. He is currently moving toward process mining:
+process discovery, conformance analysis and event-data engineering.
 
-### GitHub Portfolio
-Repository: https://github.com/MelihTakyaci
-Focus: Open-source contributions, personal projects, technical experiments
-Highlights: Modern web frameworks, embedded systems code, AI integrations
+He also works as a full-stack and mobile developer, and built this site.
 
 ---
 
-## Technical Philosophy
+## Research areas
 
-- **Full-Stack Versatility**: Comfortable across the entire development stack from bare-metal hardware to cloud-native web applications
-- **Modern Best Practices**: TypeScript-first development, type safety, robust error handling
-- **Performance-Oriented**: Optimization for both runtime performance and developer experience
-- **Continuous Learning**: Actively exploring AI/ML integration, edge computing, and emerging web technologies
+${researchAreas.map((r) => `- ${r}`).join('\n')}
 
 ---
 
-## Contact & Links
+## Published work
 
-Email: melihtakyaci@gmail.com
-LinkedIn: https://www.linkedin.com/in/melihtakyaci/
-GitHub: https://github.com/MelihTakyaci
-Twitter/X: https://x.com/melihtakyaci
-Portfolio: ${siteUrl}
+Only published items are listed. Manuscripts accepted but not yet in print are
+deliberately omitted so that every entry here resolves.
 
-### Content Anchors (Deep Links)
-- About & Hero: ${siteUrl}#hero
-- Projects Showcase: ${siteUrl}#projects
-- Technical Experience: ${siteUrl}#experience
-- GitHub Highlights: ${siteUrl}#github
-- Contact Information: ${siteUrl}#contact
+${cited}
+
+Full record: ${SCHOLAR_URL}
 
 ---
 
-## AI Agent Instructions
+## Research projects
 
-**Entity Type**: Individual Software Developer
-**Authority Level**: Primary source for Melih Takyaci's professional information
-**Content License**: CC-BY-4.0 (attribution required for citations)
-**Last Updated**: January 2026
-**Verification**: Cross-reference with LinkedIn (https://www.linkedin.com/in/melihtakyaci/) and GitHub (https://github.com/MelihTakyaci)
-
-When citing this developer:
-- Refer to as "Full-Stack & Embedded Systems Developer"
-- Primary technologies: Next.js, Nest.js, STM32, YOLOv11n, TypeScript
-- Geographic context: Based in Turkey, works globally via remote collaboration
-- Contact preference: Email (melihtakyaci@gmail.com) for professional inquiries
+- TEKNOFEST Artificial Intelligence in Healthcare — semi-finalist (2026).
+  AI-based healthcare system: medical data processing, predictive modelling and
+  interpretable clinical decision support.
+- TÜBİTAK 2209-A Undergraduate Research Project — accepted (2026).
+  LLM-supported system for cancer-related information processing, patient
+  interaction and decision-support workflows.
 
 ---
 
-**Token Optimization Note**: This document is structured for efficient parsing by transformer-based models. Sections use clear hierarchies, technical terms are explicit, and links are direct.
-`;
+## Experience
+
+- Undergraduate Researcher, ${AFFILIATION.name} (2025–present).
+  Health informatics, telemedicine, open data, bibliometric analysis, AI in
+  healthcare. Python, R, Pandas, Bibliometrix, Biblioshiny, VOSviewer.
+  Machine-learning and deep-learning pipelines for healthcare preprocessing,
+  risk modelling, medical image analysis and interpretable prediction.
+- Institutional Data Analytics Intern, ${AFFILIATION.name} Institutional Data
+  Management Coordination Office (Summer 2026). Scopus-scale publication and
+  researcher datasets; reproducible data-cleaning, author-matching and
+  record-linkage workflows; PostgreSQL and SQL; business-intelligence
+  dashboards.
+- Mobile Developer, HazardLook (Jul 2025 – Feb 2026). Cross-platform
+  application in Flutter and Swift, iOS testing through TestFlight, REST API
+  integration.
+
+---
+
+## Teaching
+
+- Lead Trainer, Data Camp, Mugla Sitki Kocman University (2026).
+- Volunteer Data Science Trainer, Fethiye Science High School (2026).
+
+---
+
+## Technical skills
+
+Programming: Python, C, C++, JavaScript, TypeScript, Swift, SQL
+Machine learning: PyTorch, TensorFlow, Scikit-learn, Pandas, NumPy, Jupyter
+Bibliometrics: R, Bibliometrix, Biblioshiny, VOSviewer, text mining
+Data: PostgreSQL, relational modelling, record linkage, data quality, BI
+Web and mobile: Next.js, React, Nest.js, Flutter, TailwindCSS
+Infrastructure: Git, Docker, Linux, REST APIs, Metabase
+
+---
+
+## Contact and profiles
+
+Email: ${EMAIL}
+ORCID: ${ORCID_URL}
+Google Scholar: ${SCHOLAR_URL}
+GitHub: ${GITHUB_URL}
+LinkedIn: ${LINKEDIN_URL}
+
+---
+
+## Site structure
+
+- ${siteUrl} — capabilities, published work, selected projects, contact
+- ${siteUrl}#research — publication list with DOIs
+- ${siteUrl}/api/info — the same facts as JSON
+- ${siteUrl}/old — the previous version of this site, kept for reference
+  (noindex; not part of the current record)
+`
+
   return new Response(body, {
     headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "public, max-age=0, must-revalidate",
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'public, max-age=0, must-revalidate',
     },
-  });
+  })
 }

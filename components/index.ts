@@ -5,6 +5,7 @@ import ExperienceCards from "./ExperienceCards";
 import ContactSection from "./ContactSection";
 import GitHubCTA from "./GitHubCTA";
 import ScholarLink from "./ScholarLink";
+import Publications from "./Publications";
 
 export {
     Header,
@@ -14,4 +15,5 @@ export {
     ContactSection,
     GitHubCTA,
     ScholarLink,
+    Publications,
 }
