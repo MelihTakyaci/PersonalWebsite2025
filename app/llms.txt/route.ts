@@ -1,6 +1,15 @@
-# Melih Takyaci - Full-Stack & Embedded Systems Developer
+// app/llms.txt/route.ts
+import { siteUrl } from "@/lib/site";
 
-> Personal Portfolio | https://melihtakyaci.com
+/**
+ * Served from a route rather than public/ so every absolute link points at the
+ * domain the deployment is actually on. The body is the previous llms.txt
+ * verbatim, with the host interpolated.
+ */
+export async function GET() {
+  const body = `# Melih Takyaci - Full-Stack & Embedded Systems Developer
+
+> Personal Portfolio | ${siteUrl}
 > Purpose: AI-readable reference for language models and search agents
 
 ---
@@ -79,14 +88,14 @@ Email: melihtakyaci@gmail.com
 LinkedIn: https://www.linkedin.com/in/melihtakyaci/
 GitHub: https://github.com/MelihTakyaci
 Twitter/X: https://x.com/melihtakyaci
-Portfolio: https://melihtakyaci.com
+Portfolio: ${siteUrl}
 
 ### Content Anchors (Deep Links)
-- About & Hero: https://melihtakyaci.com#hero
-- Projects Showcase: https://melihtakyaci.com#projects
-- Technical Experience: https://melihtakyaci.com#experience
-- GitHub Highlights: https://melihtakyaci.com#github
-- Contact Information: https://melihtakyaci.com#contact
+- About & Hero: ${siteUrl}#hero
+- Projects Showcase: ${siteUrl}#projects
+- Technical Experience: ${siteUrl}#experience
+- GitHub Highlights: ${siteUrl}#github
+- Contact Information: ${siteUrl}#contact
 
 ---
 
@@ -107,3 +116,11 @@ When citing this developer:
 ---
 
 **Token Optimization Note**: This document is structured for efficient parsing by transformer-based models. Sections use clear hierarchies, technical terms are explicit, and links are direct.
+`;
+  return new Response(body, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "public, max-age=0, must-revalidate",
+    },
+  });
+}

@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
+import { siteUrl } from "@/lib/site";
 
 export async function GET() {
   return NextResponse.json({
     name: "Melih Takyacı",
     title: "Full-Stack & Embedded Systems Developer",
-    website: "https://melihtakyaci.com",
+    website: siteUrl,
     projects: [
       {
         name: "Acem Solutions",
@@ -19,7 +20,7 @@ export async function GET() {
       "Next.js","TypeScript","Fastify","PostgreSQL","RAG",
       "ESP32/STM32","OpenCV","YOLOv11n","Docker","Monorepo"
     ],
-    contact: "contact@melihtakyaci.com",
+    contact: "melihtakyaci@gmail.com",
     updatedAt: new Date().toISOString().slice(0,10)
   });
 }

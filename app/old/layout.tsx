@@ -1,8 +1,8 @@
 // app/old/layout.tsx
 import type { Metadata } from 'next'
+import { siteUrl } from '@/lib/site'
 import './globals.css'
 
-const siteUrl = 'https://melihtakyaci.com'
 
 /**
  * The previous site, kept live at /old.
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   // supplies the rest, so spelling the name out here would repeat it.
   title: 'Previous Site',
   description:
-    'The previous version of melihtakyaci.com, kept online for reference.',
+    'The previous version of this site, kept online for reference.',
   // Superseded by the current site, so keep the archive out of search results
   // rather than competing with the live pages for the same terms.
   robots: { index: false, follow: false },
